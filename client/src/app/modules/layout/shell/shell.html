@@ -1,0 +1,27 @@
+<mat-sidenav-container class="app-shell">
+  <mat-sidenav
+    #sidenav
+    class="app-shell-sidenav"
+    mode="side"
+    [(opened)]="opened">
+    <app-sidenav class="app-shell-sidenav-content"></app-sidenav>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="app-shell-main">
+    <mat-toolbar color="primary" class="app-shell-toolbar">
+      <button
+        mat-icon-button
+        type="button"
+        (click)="sidenav.toggle()"
+        [attr.aria-label]="opened ? 'Ocultar menu' : 'Mostrar menu'">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <!-- <span class="app-shell-toolbar-title">Dashboard</span> -->
+    </mat-toolbar>
+
+    <section class="app-shell-content">
+      <router-outlet></router-outlet>
+      <app-ticket-creation-form class="app-shell-form"></app-ticket-creation-form>
+    </section>
+  </mat-sidenav-content>
+</mat-sidenav-container>

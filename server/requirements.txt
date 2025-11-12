@@ -1,0 +1,3 @@
+fastapi
+aiosqlite
+pydantic[email]

@@ -1,0 +1,241 @@
+<section
+  class="ticket-sidenav"
+  [class.ticket-sidenav--open]="sidenavState.opened()"
+  aria-hidden="{{ !sidenavState.opened() }}"
+>
+  <div class="ticket-sidenav-backdrop" (click)="onBackdropClick()" aria-hidden="true"></div>
+
+  <article class="ticket-sidenav-panel" role="dialog" aria-labelledby="ticket-sidenav-title" aria-modal="true">
+    <form class="sidenav-form" [formGroup]="ticketForm" (ngSubmit)="onSubmit()" novalidate>
+      <header class="sidenav-form-header">
+        <div>
+          <p class="sidenav-form-eyebrow">Nuevo ticket</p>
+          <h2 id="ticket-sidenav-title" class="sidenav-form-title">Registrar solicitud</h2>
+          <p class="sidenav-form-subtitle">El contenedor ocupa el 25% del lienzo y es totalmente responsivo.</p>
+        </div>
+        <button type="button" class="sidenav-form-close" (click)="onCancel()" aria-label="Cerrar panel">
+          <mat-icon aria-hidden="true">close</mat-icon>
+        </button>
+      </header>
+
+      @if (formErrorMessage()) {
+        <p class="sidenav-form-banner sidenav-form-banner--error" role="alert">
+          <mat-icon aria-hidden="true">error_outline</mat-icon>
+          {{ formErrorMessage() }}
+        </p>
+      }
+
+      @if (submitSuccess()) {
+        <p class="sidenav-form-banner sidenav-form-banner--success" role="status">
+          <mat-icon aria-hidden="true">check_circle</mat-icon>
+          Ticket creado correctamente.
+        </p>
+      }
+
+      <mat-horizontal-stepper
+        #ticketStepper
+        class="sidenav-form-stepper"
+        [linear]="true">
+        <mat-step [stepControl]="generalForm">
+          <ng-template matStepLabel>Nota</ng-template>
+
+          <section class="sidenav-section" formGroupName="general">
+            <header class="sidenav-section-header">
+              <h3 class="sidenav-section-title">Datos generales</h3>
+              <p class="sidenav-section-subtitle">Código autogenerado, prioridad y tipo de solicitud.</p>
+            </header>
+
+            @if (referencesHasError()) {
+              <p class="sidenav-form-banner sidenav-form-banner--warning" role="status">
+                <mat-icon aria-hidden="true">warning</mat-icon>
+                No pudimos cargar el catálogo de referencias.
+              </p>
+            }
+
+            <div class="sidenav-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Código</mat-label>
+                <input matInput formControlName="code" readonly />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Tipo de solicitud</mat-label>
+                <mat-select formControlName="request_type_id">
+                  @if (referencesLoading() && !requestTypes().length) {
+                    <mat-option disabled>Cargando tipos…</mat-option>
+                  } @else if (!requestTypes().length) {
+                    <mat-option disabled>No hay tipos disponibles.</mat-option>
+                  } @else {
+                    @for (requestType of requestTypes(); track requestType.id) {
+                      <mat-option [value]="requestType.id">
+                        <div class="sidenav-option">
+                          <span class="sidenav-option-label">{{ typeOptionLabel(requestType) }}</span>
+                        </div>
+                      </mat-option>
+                    }
+                  }
+                </mat-select>
+                <mat-hint>Selecciona el identificador del tipo.</mat-hint>
+                @if (generalForm.get('request_type_id')?.hasError('required')) {
+                  <mat-error>Debes indicar el tipo.</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Nivel de prioridad</mat-label>
+                <mat-select formControlName="priority_type_id">
+                  @if (referencesLoading() && !priorityTypes().length) {
+                    <mat-option disabled>Cargando prioridades…</mat-option>
+                  } @else if (!priorityTypes().length) {
+                    <mat-option disabled>No hay prioridades registradas.</mat-option>
+                  } @else {
+                    @for (priorityType of priorityTypes(); track priorityType.id) {
+                      <mat-option [value]="priorityType.id">
+                        <div class="sidenav-option sidenav-option--priority">
+                          <!-- <span class="sidenav-option-indicator" [ngClass]="priorityIndicatorClass(priorityType)"></span>-->
+                          <span class="sidenav-option-label">{{ typeOptionLabel(priorityType) }}</span>
+                        </div>
+                      </mat-option>
+                    }
+                  }
+                </mat-select>
+                <mat-hint>Define la urgencia inicial.</mat-hint>
+                @if (generalForm.get('priority_type_id')?.hasError('required')) {
+                  <mat-error>Debes establecer la prioridad.</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="sidenav-grid-full">
+                <mat-label>Detalle</mat-label>
+                <textarea
+                  matInput
+                  formControlName="note"
+                  rows="10"
+                  maxlength="1000"
+                  placeholder="Describe brevemente el contexto del ticket"
+                ></textarea>
+                <mat-hint align="end">{{ generalForm.get('note')?.value?.length || 0 }}/1000</mat-hint>
+              </mat-form-field>
+            </div>
+
+            <div class="sidenav-attachments">
+              <input
+                type="file"
+                multiple
+                class="sidenav-attachments-input"
+                (change)="onAttachmentsSelected($event)"
+                #attachmentsInput
+              />
+
+              <div
+                class="sidenav-dropzone"
+                [class.sidenav-dropzone--active]="dropzoneActive()"
+                (click)="attachmentsInput.click()"
+                (dragover)="onDropzoneDragOver($event)"
+                (dragleave)="onDropzoneDragLeave($event)"
+                (drop)="onDropzoneDrop($event)"
+                (keydown.enter)="attachmentsInput.click()"
+                (keydown.space)="attachmentsInput.click()"
+                role="button"
+                tabindex="0"
+                aria-label="Haz clic o arrastra archivos para adjuntarlos al ticket"
+              >
+                <div class="sidenav-dropzone-icon" aria-hidden="true">
+                  <mat-icon aria-hidden="true">cloud_upload</mat-icon>
+                </div>
+                <div class="sidenav-dropzone-content">
+                  <p class="sidenav-dropzone-title">Arrastra y suelta archivos aquí</p>
+                  <p class="sidenav-dropzone-subtitle">
+                    o <span class="sidenav-dropzone-action">haz clic para buscarlos</span>
+                  </p>
+                  <p class="sidenav-dropzone-tip">PDF, imágenes o ZIP. Máximo 15&nbsp;MB c/u.</p>
+                </div>
+              </div>
+
+              @if (attachments().length) {
+                <section class="sidenav-attachments-list" aria-live="polite">
+                  <div class="sidenav-attachments-chips" aria-label="Archivos seleccionados">
+                    @for (file of attachments(); track file.name; let idx = $index) {
+                      <article class="sidenav-attachment" aria-label="{{ file.name }}">
+                        <div class="sidenav-attachment-info">
+                          <span class="sidenav-attachment-name">{{ file.name }}</span>
+                          <span class="sidenav-attachment-size">{{ attachmentSize(file) }}</span>
+                        </div>
+                        <button
+                          type="button"
+                          class="sidenav-attachment-remove"
+                          (click)="removeAttachment(idx)"
+                          aria-label="Eliminar {{ file.name }}"
+                        >
+                          <mat-icon aria-hidden="true">close</mat-icon>
+                        </button>
+                      </article>
+                    }
+                  </div>
+                </section>
+              }
+            </div>
+          </section>
+
+          <div class="sidenav-step-actions">
+            <button mat-flat-button color="primary" matStepperNext type="button">
+              Continuar
+              <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+            </button>
+          </div>
+        </mat-step>
+
+        <mat-step [stepControl]="assignmentForm">
+          <ng-template matStepLabel>Asignación</ng-template>
+
+          <section class="sidenav-section" formGroupName="assignment">
+            <header class="sidenav-section-header">
+              <h3 class="sidenav-section-title">Equipo y responsable</h3>
+              <p class="sidenav-section-subtitle">
+                El estado inicial es "En espera" y el equipo predeterminado es Soporte. Define el agente asignado.
+              </p>
+            </header>
+
+            <div class="sidenav-grid">
+              <mat-form-field appearance="outline" class="sidenav-grid-full">
+                <mat-label>Asignar a</mat-label>
+                <mat-select formControlName="assignee_id">
+                  @if (referencesLoading() && !supportUsers().length) {
+                    <mat-option disabled>Cargando agentes…</mat-option>
+                  } @else if (!supportUsers().length) {
+                    <mat-option disabled>No hay agentes disponibles.</mat-option>
+                  } @else {
+                    @for (supportUser of supportUsers(); track supportUser.id) {
+                      <mat-option [value]="supportUser.id">
+                        <div class="sidenav-option">
+                          <span class="sidenav-option-label">{{ userOptionLabel(supportUser) }}</span>
+                        </div>
+                      </mat-option>
+                    }
+                  }
+                </mat-select>
+                <mat-hint>Selecciona la persona responsable.</mat-hint>
+                @if (assignmentForm.get('assignee_id')?.hasError('required')) {
+                  <mat-error>Debes asignar un responsable.</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </section>
+
+          <div class="sidenav-step-actions sidenav-step-actions--end">
+            <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+            <span class="sidenav-step-actions-spacer"></span>
+            <button mat-stroked-button color="primary" matStepperPrevious type="button">
+              <mat-icon aria-hidden="true">arrow_back</mat-icon>
+              Anterior
+            </button>
+            <button mat-flat-button color="primary" type="submit" [disabled]="submitting()">
+              <mat-icon aria-hidden="true">{{ submitting() ? 'hourglass_top' : 'add_task' }}</mat-icon>
+              {{ submitting() ? 'Creando…' : 'Crear ticket' }}
+            </button>
+          </div>
+        </mat-step>
+      </mat-horizontal-stepper>
+    </form>
+  </article>
+</section>

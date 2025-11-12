@@ -1,0 +1,26 @@
+<mat-nav-list>
+  @for (module of modules; track module.name) {
+    <a
+      mat-list-item
+      class="sidenav-option"
+      [routerLink]="module.route"
+      routerLinkActive="active"
+      (click)="module.onClick?.($event)">
+
+      <span matListItemIcon>
+        <mat-icon class="sidenav-option-icon">{{ module.icon }}</mat-icon>
+
+        <!-- @if (module.name == 'Tickets') {
+          <span class="sidenav-icon-badge">{{ 1 }}</span>
+        }
+        -->
+      </span>
+
+      <span class="sidenav-option-label">{{ module.name }}</span>
+
+    </a>
+
+    <!-- <mat-divider></mat-divider> -->
+  }
+
+</mat-nav-list>

@@ -1,0 +1,65 @@
+<article class="ticket-detail">
+  <header class="ticket-detail-header">
+    <div class="ticket-detail-heading">
+      <span
+        class="ticket-status-dot"
+        [class.ticket-status-dot--on-hold]="statusKey === 'on_hold'"
+        [class.ticket-status-dot--in-progress]="statusKey === 'in_progress'"
+        [class.ticket-status-dot--default]="statusKey !== 'on_hold' && statusKey !== 'in_progress'"
+        aria-hidden="true"
+      ></span>
+      <div class="ticket-detail-heading-text">
+        <p class="ticket-detail-eyebrow">Detalle del ticket</p>
+        <h2 class="ticket-detail-title">{{ displayTitle }}</h2>
+      </div>
+    </div>
+    <button type="button" class="ticket-detail-close" (click)="onClose()" aria-label="Cerrar dialogo">
+      <mat-icon aria-hidden="true">close</mat-icon>
+    </button>
+  </header>
+
+  <div class="ticket-detail-chips">
+    <span class="ticket-pill ticket-pill--code">{{ ticket.code }}</span>
+    <span class="ticket-pill" [ngClass]="statusAccentClass">
+      <span class="ticket-pill-label">Estado</span>
+      <span class="ticket-pill-value">{{ statusLabel }}</span>
+    </span>
+    <span class="ticket-pill">
+      <span class="ticket-pill-label">Tipo</span>
+      <span class="ticket-pill-value">{{ requestLabel }}</span>
+    </span>
+    <span class="ticket-pill">
+      <span class="ticket-pill-label">Prioridad</span>
+      <span class="ticket-pill-value">{{ priorityLabel }}</span>
+    </span>
+  </div>
+
+  <section class="ticket-detail-panel">
+    <header class="ticket-detail-panel-heading">
+      <span class="ticket-detail-panel-label">Solicitante</span>
+    </header>
+    <div class="ticket-detail-panel-body">
+      <p class="ticket-detail-panel-title">{{ requesterDisplayName }}</p>
+    </div>
+  </section>
+
+  <section class="ticket-detail-panel ticket-detail-panel--description">
+    <header class="ticket-detail-panel-heading">
+      <span class="ticket-detail-panel-label">Descripcion</span>
+    </header>
+    <div class="ticket-detail-panel-body">
+      <p class="ticket-detail-panel-text">
+        {{ noteText }}
+      </p>
+    </div>
+  </section>
+
+  <section class="ticket-detail-panel">
+    <header class="ticket-detail-panel-heading">
+      <span class="ticket-detail-panel-label">Última actualización</span>
+    </header>
+    <div class="ticket-detail-panel-body">
+      <p class="ticket-detail-panel-title">{{ lastUpdated }}</p>
+    </div>
+  </section>
+</article>

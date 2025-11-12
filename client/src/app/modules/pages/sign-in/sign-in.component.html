@@ -1,0 +1,82 @@
+<section class="authentication">
+  <div class="authentication-panel authentication-panel--visual" aria-hidden="true">
+    <!-- <span class="authentication-panel-label">Panel A</span> -->
+  </div>
+
+  <div class="authentication-panel authentication-panel--form">
+    <mat-card class="authentication-card" appearance="outlined">
+      <mat-card-header class="authentication-header">
+        <mat-icon class="authentication-header-icon" aria-hidden="true">lock_person</mat-icon>
+        <!--
+        <mat-card-title>Australian Shepherd</mat-card-title>
+        <mat-card-subtitle>Herding group</mat-card-subtitle>
+        -->
+
+        <br>
+
+        <mat-divider></mat-divider>
+
+      </mat-card-header>
+
+
+
+      <form
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+        autocomplete="on"
+        [attr.aria-busy]="loading()"
+        novalidate>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Usuario</mat-label>
+          <input type="text" matInput formControlName="username" required autocomplete="username" />
+          <mat-icon matSuffix>person</mat-icon>
+          @if (controls.username.hasError('required') && controls.username.touched) {
+            <mat-error>Campo requerido.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Contraseña</mat-label>
+          <input
+            [type]="showPassword() ? 'text' : 'password'"
+            matInput
+            formControlName="password"
+            required>
+          <button
+            type="button"
+            mat-icon-button
+            matSuffix
+            (click)="changePasswordVisibility()"
+            [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            [attr.aria-pressed]="showPassword()">
+            <mat-icon>{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (controls.password.hasError('required') && controls.password.touched) {
+            <mat-error>Campo requerido.</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="authentication-actions">
+          <button
+            class="authentication-button"
+            type="submit"
+            mat-flat-button
+            color="primary"
+            extended
+            [disabled]="form.invalid || loading()">
+            @if (loading()) {
+              <mat-icon class="authentication-spinner" aria-hidden="true">autorenew</mat-icon>
+            } @else {
+              Iniciar sesión
+            }
+          </button>
+        </div>
+
+        @if (error()) {
+          <p class="authentication-error" role="alert">{{ error() }}</p>
+        }
+      </form>
+    </mat-card>
+  </div>
+</section>
