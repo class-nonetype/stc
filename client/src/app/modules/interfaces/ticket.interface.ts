@@ -157,6 +157,31 @@ export interface TicketCreateRequest {
   title?: string;
 }
 
+
+export type TicketResponse = {
+  id?: string;
+  code?: string;
+  note?: string | null;
+  requestTypeId?: string | null;
+  request?: string | null;
+  priorityTypeId?: string | null;
+  priority?: string | null;
+  statusTypeId?: string | null;
+  status?: string | null;
+  requesterId?: string;
+  assigneeId?: string | null;
+  requester?: string | null;
+  assignee?: string | null;
+  teamId?: string | null;
+  duetAt?: string | null;
+  resolvedAt?: string | null;
+  closedAt?: string | null;
+  deletedAt?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  isResolved?: boolean | null;
+};
+
 export interface TicketUpdateRequest extends Partial<TicketCreateRequest> {
   id: string;
 }

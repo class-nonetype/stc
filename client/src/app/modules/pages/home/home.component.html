@@ -42,10 +42,11 @@
             <p>{{ dashboardOption.subtitle }}</p>
           }
 
-          @if ((dashboardOption.value !== undefined && dashboardOption.value !== null) && dashboardOption.trend){
+          @if ((dashboardOption.value !== undefined && dashboardOption.value !== null) ){
 
             @if ( dashboardOption.value == 0 ) {
-              <strong class="dashboard-card-value">Aún no ha finalizado ningún ticket.</strong>
+              <!-- <strong class="dashboard-card-value">Aún no ha finalizado ningún ticket.</strong> -->
+              <p>Aún no hay avance en el ticket.</p>
             } @else {
               <strong class="dashboard-card-value">{{ dashboardOption.value }}</strong>
               <!-- <span class="dashboard-card-trend">{{ dashboardOption.trend }}</span> -->
@@ -59,11 +60,12 @@
 
   </section>
 
-
+  <!--
   <section class="dashboard-empty">
     <div>
       <h2>Elige una opción del menú</h2>
       <p>Explora Analytics, Reporting o Projects para comenzar a trabajar.</p>
     </div>
   </section>
+  -->
 </section>

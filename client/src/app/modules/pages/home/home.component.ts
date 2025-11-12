@@ -11,6 +11,32 @@ import { Router } from '@angular/router';
 import { AuthenticationSessionService } from '../../services/authentication.service';
 import { TicketService } from '../../services/ticket.service';
 
+import { forkJoin, map } from 'rxjs';
+
+
+type TicketCounts = {
+  opened: number;
+  inProgress: number;
+  onHold: number;
+  closed: number;
+  cancelled: number;
+  finished: number;
+};
+
+type ClickHandler = () => void | Promise<boolean>;
+
+interface HomeOption {
+  icon: string;
+  label: string;
+  subtitle: string;
+  click: ClickHandler;
+  iconBadge?: string;
+  value?: number;
+  trend?: string;
+}
+
+
+
 @Component({
   standalone: true,
   selector: 'home-page',
@@ -34,9 +60,27 @@ export class HomePage {
   private readonly form = inject(FormService);
   private readonly router = inject(Router);
 
-  private countFinishedTickets = 0;
+  //private readonly ticketCount = {
+  //  opened: 0,
+  //  inProgress: 0,
+  //  onHold: 0,
+  //  closed: 0,
+  //  cancelled: 0,
+  //  finished: 0,
+  //};
 
-  readonly options = [
+  private readonly statusMap: Record<string, keyof TicketCounts> = {
+    'Abierto': 'opened',
+    'En proceso': 'inProgress',
+    'En espera': 'onHold',
+    'Cerrado': 'closed',
+    'Cancelado': 'cancelled',
+    'Resuelto': 'finished',
+  };
+
+  ticketCount: TicketCounts = { opened: 0, inProgress: 0, onHold: 0, closed: 0, cancelled: 0, finished: 0 };
+
+  options: HomeOption[] = [
     {
       icon: 'person',
       iconBadge: 'speaker_notes',
@@ -50,47 +94,88 @@ export class HomePage {
       subtitle: 'Visualice las solicitudes que han sido emitidas.',
       click: () => this.router.navigate(['/tickets'])
     },
-    {
-      icon: 'group',
-      label: 'Clientes',
-      value: '1 280',
-      trend: '+5%' ,
-      click: () => console.log('Clientes clicked')
-    },
-    {
-      icon: 'task_alt',
-      label: 'Tickets finalizados',
-      value: this.countFinishedTickets ?? 0,
-      trend: 'En progreso',
-      click: () => console.log('Tickets finalizados clicked')
-    },
   ];
 
-  private readonly finishedTicketsOption = this.options.find(option => option.label === 'Tickets finalizados');
+  x = [];
 
-  constructor() {
-    this.loadFinishedTicketsCount();
+
+  constructor() { this.loadTicketCount();}
+
+
+  private loadTicketCount(): void {
+    const requesterId = this.userSession.getCurrentUserId();
+    if (!requesterId) return;
+
+    const statusTypes = Object.keys(this.statusMap);
+
+    const requests = statusTypes.map(st =>
+      this.ticketService.getCountTicketsByRequesterId(requesterId, st)
+        .pipe(map(count => ({ st, count })))
+    );
+
+    forkJoin(requests).subscribe({
+      next: results => {
+        for (const { st, count } of results) {
+          const key = this.statusMap[st];
+          this.ticketCount[key] = count;
+        }
+        this.updateOptions(); // ahora sí, ya tienes los números
+        console.log('ticketCount listo:', this.ticketCount);
+      },
+      error: err => console.error('No se pudieron cargar los conteos', err),
+    });
   }
 
-  private loadFinishedTicketsCount(): void {
-    const requesterId = this.userSession.getCurrentUserId();
-    if (!requesterId) {
-      return;
-    }
-
-    this.ticketService.getCountFinishedTicketsByRequesterId(requesterId).subscribe({
-      next: count => {
-        this.countFinishedTickets = count;
-
-        console.log(this.countFinishedTickets);
-
-
-        if (this.finishedTicketsOption) {
-          this.finishedTicketsOption.value = this.countFinishedTickets;
-        }
+  private updateOptions() {
+    this.options.push(
+      {
+        icon: 'schedule',
+        label: 'Tickets en espera',
+        subtitle: '',
+        value: this.ticketCount.onHold,
+        click: () => console.log('Tickets finalizados clicked')
       },
-      error: error => console.error('Failed to load finished tickets count', error),
-    });
+
+      {
+        icon: 'pending',
+        label: 'Tickets en proceso',
+        subtitle: '',
+        value: this.ticketCount.inProgress,
+        click: () => console.log('Tickets finalizados clicked')
+      },
+
+      {
+        icon: 'visibility',
+        label: 'Tickets abiertos',
+        subtitle: '',
+        value: this.ticketCount.opened,
+        click: () => console.log('Tickets finalizados clicked')
+      },
+
+      {
+        icon: 'cancel',
+        label: 'Tickets cerrados',
+        subtitle: '',
+        value: this.ticketCount.closed,
+        click: () => console.log('Tickets finalizados clicked')
+      },
+
+      {
+        icon: 'error',
+        label: 'Tickets cancelados',
+        subtitle: '',
+        value: this.ticketCount.cancelled,
+        click: () => console.log('Tickets finalizados clicked')
+      },
+
+      {
+        icon: 'task_alt',
+        label: 'Tickets finalizados',
+        subtitle: '',
+        value: this.ticketCount.finished,
+        click: () => console.log('Tickets finalizados clicked')
+      },
+    );
   }
 
 

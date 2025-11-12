@@ -36,6 +36,7 @@ export class SidenavOptions {
         this.router.navigate(['/dashboard']);
       },
     },
+
     {
       name: 'Tickets',
       route: '/tickets',

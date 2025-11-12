@@ -51,7 +51,7 @@
 
 .dashboard-option-card {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
   width: 100%;
   height: 100%;
@@ -88,6 +88,7 @@
   justify-content: center;
   color: #0f172a;
   background: radial-gradient(circle at 35% 30%, #ffffff 0%, #f1f5ff 100%);
+  align-self: center;
 }
 
 .dashboard-option-icon-main {
@@ -124,6 +125,14 @@
   line-height: 1;
 }
 
+.dashboard-option-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.35rem;
+  width: 100%;
+}
+
 
 .dashboard-option-content h3 {
   margin: 0;
@@ -133,7 +142,7 @@
 }
 
 .dashboard-option-content p {
-  margin: 0.35rem 0 0;
+  margin: 0;
   color: #475569;
   line-height: 1.45;
 }
@@ -174,6 +183,8 @@
 .dashboard-card-value {
   font-size: 1.45rem;
   font-weight: 700;
+  text-align: center;
+  justify-content: center;
 }
 
 .dashboard-card-trend {

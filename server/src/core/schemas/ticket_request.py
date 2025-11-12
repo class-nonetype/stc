@@ -1,23 +1,13 @@
-from __future__ import annotations
-
+from fastapi import Form
 from datetime import datetime, timezone
+from pydantic import BaseModel, ConfigDict, field_validator
 from uuid import UUID
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    AwareDatetime,
-    Field,
-    field_validator,
-    model_validator,
-)
-
 
 class TicketRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    code: str = Field(..., min_length=1, max_length=32)
-    #title: str = Field(..., min_length=1, max_length=100)
-    note: str = Field('', min_length=0)
+    code: str
+    note: str = ''
 
     request_type_id: UUID
     priority_type_id: UUID
@@ -25,29 +15,38 @@ class TicketRequest(BaseModel):
     requester_id: UUID
     assignee_id: UUID | None = None
     team_id: UUID | None = None
-    
-    
 
-    # fecha límite (opcional)
-    due_at: AwareDatetime | None = None
+    due_at: datetime | None = None
+    resolved_at: datetime | None = None
+    closed_at: datetime | None = None
 
-    # fecha de resolución (la suele poner el sistema)
-    resolved_at: AwareDatetime | None = None
-
-    # fecha de cierre (la suele poner el sistema)
-    closed_at: AwareDatetime | None = None
-
-    # Acepta datetimes naive y los vuelve UTC-aware
     @field_validator('due_at', 'resolved_at', 'closed_at', mode='before')
     @classmethod
-    def _ensure_tzaware(cls, v):
-        if v is None: return v
-        if isinstance(v, datetime) and v.tzinfo is None: return v.replace(tzinfo=timezone.utc)
+    def _tzaware(cls, v):
+        if isinstance(v, datetime) and v.tzinfo is None:
+            return v.replace(tzinfo=timezone.utc)
         return v
 
-    @model_validator(mode='after')
-    def _temporal_consistency(self):
-        # Si hay closed_at debe existir resolved_at y no ser anterior
-        if self.closed_at and not self.resolved_at: raise ValueError('closed_at requiere resolved_at')
-        if self.closed_at and self.closed_at < self.resolved_at: raise ValueError('closed_at no puede ser anterior a resolved_at')
-        return self
+    # Parsear multipart -> modelo
+    @classmethod
+    def as_form(
+        cls,
+        code: str = Form(...),
+        note: str = Form(''),
+        request_type_id: UUID = Form(...),
+        priority_type_id: UUID = Form(...),
+        status_type_id: UUID = Form(...),
+        requester_id: UUID = Form(...),
+        assignee_id: UUID | None = Form(None),
+        team_id: UUID | None = Form(None),
+        due_at: datetime | None = Form(None),
+        resolved_at: datetime | None = Form(None),
+        closed_at: datetime | None = Form(None),
+    ) -> "TicketRequest":
+        return cls(
+            code=code, note=note,
+            request_type_id=request_type_id, priority_type_id=priority_type_id,
+            status_type_id=status_type_id, requester_id=requester_id,
+            assignee_id=assignee_id, team_id=team_id,
+            due_at=due_at, resolved_at=resolved_at, closed_at=closed_at,
+        )

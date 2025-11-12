@@ -18,6 +18,7 @@
   flex-direction: column;
   height: 100%;
   box-shadow: inset -1px 0 0 rgba(15, 23, 42, 0.08);
+  border-radius: 0;
 }
 
 .app-shell-sidenav-content {

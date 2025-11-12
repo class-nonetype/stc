@@ -26,7 +26,7 @@ from src.core.database.queries.helpers import insert_object_model
 from src.core.database.session import database
 from src.core.database.queries.select import (
     select_all_tickets_by_requester_id,
-    select_count_finished_tickets_by_requester_id,
+    select_count_tickets_by_requester_id,
     select_all_request_types,
     select_all_priority_types,
     select_all_status_types,
@@ -41,95 +41,17 @@ from src.utils.paths import TICKETS_ATTACHMENTS_DIRECTORY_PATH
 
 router = APIRouter()
 
-
-
-
-
-@router.get('/tickets')
-async def get_all_tickets():
-    statuses = ['open', 'in_progress', 'on_hold', 'resolved', 'closed', 'cancelled']
-    priorities = ['low', 'medium', 'high', 'urgent']
-    ticket_types = ['bug', 'feature', 'task', 'incident', 'question', 'support']
-    subjects = [
-        'Error en inicio de sesión',
-        'Solicitud de acceso a sistema',
-        'Actualización de software',
-        'Reporte de incidencia en producción',
-        'Pregunta sobre facturación',
-        'Solicitud de soporte general',
-        'Error intermitente en API',
-        'Mejora de panel administrativo',
-        'Revisión de contrato de servicio',
-        'Sincronización fallida con CRM',
-    ]
-    requester_first_names = ['María', 'Juan', 'Luis', 'Carla', 'Pedro', 'Camila', 'Andrés', 'Paula', 'Sofía', 'Diego']
-    requester_last_names = ['Torres', 'Ramírez', 'González', 'Fernández', 'Martínez', 'Pérez', 'López', 'Duarte', 'Silva', 'Rivas']
-
-    base_datetime = datetime.utcnow()
-    items = []
-
-    total_tickets = 600
-    for index in range(1, total_tickets + 1):
-        status = statuses[index % len(statuses)]
-        priority = priorities[index % len(priorities)]
-        ticket_type = ticket_types[index % len(ticket_types)]
-        subject = subjects[index % len(subjects)]
-
-        requester_first = requester_first_names[index % len(requester_first_names)]
-        requester_last = requester_last_names[(index // len(requester_first_names)) % len(requester_last_names)]
-        requester_name = f'{requester_first} {requester_last}'
-        requester_id = str(uuid4())
-
-        created_at = base_datetime - timedelta(days=index // 5, hours=index % 24, minutes=(index * 3) % 60)
-        updated_at = created_at + timedelta(hours=(index * 2) % 72)
-
-        ticket_id = str(uuid4())
-        code = f'TCK-{index:04d}'
-
-        items.append({
-            'id': ticket_id,
-            'code': code,
-            'title': subject,
-            'description': (
-                f'{subject}. Este es un ticket generado de manera ficticia para pruebas de interfaz. '
-                f'Prioridad {priority.upper()} con estado {status.replace("_", " ").title()}. '
-                f'Indice interno {index}.'
-            ),
-            'status': status,
-            'priority': priority,
-            'type': ticket_type,
-            'requester': {
-                'id': requester_id,
-                'displayName': requester_name,
-                'email': f'{requester_first.lower()}.{requester_last.lower()}@example.com',
-                'avatarUrl': None,
-            },
-            'assignee': {
-                'id': str(uuid4()),
-                'displayName': f'Agente {index % 25 + 1}',
-                'email': f'agente{index % 25 + 1}@support.local',
-                'avatarUrl': None,
-            },
-            'tags': ['demo', priority, ticket_type],
-            'createdAt': created_at.isoformat(timespec='seconds') + 'Z',
-            'updatedAt': updated_at.isoformat(timespec='seconds') + 'Z',
-        })
-
-    return {
-        'items': items,
-        'total': total_tickets,
-    }
-
-
 @router.get('/select/all/tickets/{requester_id}')
 async def get_all_tickets_by_requester_id(request: Request, session: Annotated[AsyncGenerator, Depends(database)],  requester_id: UUID):
     data = await select_all_tickets_by_requester_id(session=session, requester_id=requester_id)
     return {'data': data}
 
-
 @router.get('/select/total/tickets/{requester_id}')
-async def get_total_tickets(request: Request, session: Annotated[AsyncGenerator, Depends(database)],  requester_id: UUID):
-    data = await select_count_finished_tickets_by_requester_id(session=session, requester_id=requester_id)
+async def get_total_tickets(request: Request,
+                            session: Annotated[AsyncGenerator, Depends(database)], 
+                            requester_id: UUID,
+                            status: str):
+    data = await select_count_tickets_by_requester_id(session=session, requester_id=requester_id, status=status)
     return {'data': data}
 
 
@@ -171,12 +93,12 @@ async def post_ticket(
     priority_type_id: str = Form(...),
     status_type_id: str = Form(...),
     requester_id: str = Form(...),
-    assignee_id: str | None = Form(None),
+    assignee_id: str | None = Form(...),
     team_id: str | None = Form(None),
     due_at: str | None = Form(None),
     resolved_at: str | None = Form(None),
     closed_at: str | None = Form(None),
-    attachments: Sequence[UploadFile] | None = File(None),
+    attachments: (UploadFile | list[UploadFile] | Sequence[UploadFile] | None) = File(None),
 ):
     def _parse_uuid(value: str, field: str) -> UUID:
         try:
@@ -196,6 +118,15 @@ async def post_ticket(
             return None
         trimmed = value.strip()
         return trimmed or None
+
+
+    def _normalize_uploads(value: UploadFile | Sequence[UploadFile] | None) -> list[UploadFile]:
+        if value is None:
+            return []
+        if isinstance(value, (list, tuple)):
+            return [v for v in value if v is not None]
+        # cualquier cosa que no sea lista/tuple, trátala como un único archivo
+        return [value]
 
 
     async def _handle_ticket_attachments(
@@ -239,7 +170,7 @@ async def post_ticket(
                 'id': str(attachment.id),
                 'file_name': attachment.file_name,
                 'file_uuid_name': attachment.file_uuid_name,
-                'file_path': attachment.file_path.as_posix(),
+                'file_path': attachment.file_path,
                 'mime_type': attachment.mime_type,
                 'file_size': attachment.file_size,
                 'url': request.url_for(
@@ -274,7 +205,7 @@ async def post_ticket(
     attachments_payload = await _handle_ticket_attachments(
         session=session,
         ticket_id=object_model.id,
-        uploads=list(attachments or []),
+        uploads=_normalize_uploads(attachments),
         request=request,
     )
 

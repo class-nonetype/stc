@@ -280,6 +280,17 @@
   box-shadow: 0 10px 18px -12px rgba(15, 23, 42, 0.5);
 }
 
+
+.inbox-filters {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+.inbox-filter-checkbox { display: inline-flex; align-items: center; gap: 6px; }
+.inbox-filter-reset { height: 40px; }
+
 @media (max-width: 720px) {
   .inbox-card {
     grid-template-columns: 1fr;

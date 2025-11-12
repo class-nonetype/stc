@@ -1,8 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '@environments/environment';
 import { endpoints } from '../constants/endpoints';
-import type { LevelType, SupportUser, CountFinishedTickets, Ticket, TicketCreateRequest } from '../interfaces/ticket.interface';
+import type { LevelType, SupportUser, CountFinishedTickets, Ticket, TicketResponse, TicketCreateRequest } from '../interfaces/ticket.interface';
 import { forkJoin, of } from 'rxjs';
 import { Observable, catchError, map, tap, throwError } from 'rxjs';
 
@@ -12,29 +12,6 @@ interface ApiCollectionResponse<T> {
   data?: T[] | T | null;
 }
 
-type RawTicket = {
-  id?: string;
-  code?: string;
-  note?: string | null;
-  requestTypeId?: string | null;
-  request?: string | null;
-  priorityTypeId?: string | null;
-  priority?: string | null;
-  statusTypeId?: string | null;
-  status?: string | null;
-  requesterId?: string;
-  assigneeId?: string | null;
-  requester?: string | null;
-  assignee?: string | null;
-  teamId?: string | null;
-  duetAt?: string | null;
-  resolvedAt?: string | null;
-  closedAt?: string | null;
-  deletedAt?: string | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  isResolved?: boolean | null;
-};
 
 @Injectable({ providedIn: 'root' })
 export class TicketService {
@@ -167,7 +144,7 @@ export class TicketService {
       });
   }
 
-  getCountFinishedTicketsByRequesterId(requesterId: string): Observable<number> {
+  getCountTicketsByRequesterId(requesterId: string, statusType: string): Observable<number> {
     if (!requesterId || requesterId === '') {
       console.warn('Cannot load finished tickets count without a requester id.');
       return of(0);
@@ -175,7 +152,13 @@ export class TicketService {
 
     const url = `${environment.apiUrl}/${endpoints.tickets.countByRequester(requesterId)}`;
 
-    return this.http.get<ApiCollectionResponse<CountFinishedTickets>>(url).pipe(
+    let params = new HttpParams();
+    if (statusType && statusType.trim() !== '') {
+      params = params.set('status', statusType);
+    }
+
+
+    return this.http.get<ApiCollectionResponse<CountFinishedTickets>>(url, { params }).pipe(
       map(response => {
         const data = (response.data ?? { count: 0 }) as CountFinishedTickets;
         return data.count;
@@ -194,9 +177,9 @@ export class TicketService {
     const body = payload instanceof FormData ? payload : this.toFormData(payload);
 
     return this.http
-      .post<RawTicket>(`${environment.apiUrl}/${endpoints.tickets.create}`, body)
+      .post<TicketResponse>(`${environment.apiUrl}/${endpoints.tickets.create}`, body)
       .pipe(
-        map(rawTicket => this.mapToTicket(rawTicket, this.tickets().length)),
+        map(schema => this.mapToTicket(schema, this.tickets().length)),
         tap(ticket => {
           this.tickets.update(previous => [ticket, ...previous]);
         }),
@@ -263,32 +246,32 @@ export class TicketService {
       return this.createFallbackTicket(index);
     }
 
-    const raw = entry as RawTicket;
-    const id = this.ensureString(raw.id, `raw-${index}-${Date.now()}`);
-    const code = this.ensureString(raw.code, `#${id.slice(0, 6).toUpperCase()}`);
+    const schema = entry as TicketResponse;
+    const id = this.ensureString(schema.id, `schema-${index}-${Date.now()}`);
+    const code = this.ensureString(schema.code, `#${id.slice(0, 6).toUpperCase()}`);
 
     return {
       id,
       code,
-      note: this.ensureString(raw.note, ''),
-      requestTypeId: this.toNullableString(raw.requestTypeId),
-      request: this.toNullableString(raw.request),
-      priorityTypeId: this.toNullableString(raw.priorityTypeId),
-      priority: this.toNullableString(raw.priority),
-      statusTypeId: this.toNullableString(raw.statusTypeId),
-      status: this.toNullableString(raw.status),
-      requesterId: this.ensureString(raw.requesterId, 'Sin solicitante'),
-      assigneeId: this.toNullableString(raw.assigneeId),
-      requester: this.toNullableString(raw.requester),
-      assignee: this.toNullableString(raw.assignee),
-      teamId: this.toNullableString(raw.teamId),
-      duetAt: this.toNullableString(raw.duetAt),
-      resolvedAt: this.toNullableString(raw.resolvedAt),
-      closedAt: this.toNullableString(raw.closedAt),
-      deletedAt: this.toNullableString(raw.deletedAt),
-      createdAt: this.toNullableString(raw.createdAt),
-      updatedAt: this.toNullableString(raw.updatedAt),
-      isResolved: typeof raw.isResolved === 'boolean' ? raw.isResolved : null,
+      note: this.ensureString(schema.note, ''),
+      requestTypeId: this.toNullableString(schema.requestTypeId),
+      request: this.toNullableString(schema.request),
+      priorityTypeId: this.toNullableString(schema.priorityTypeId),
+      priority: this.toNullableString(schema.priority),
+      statusTypeId: this.toNullableString(schema.statusTypeId),
+      status: this.toNullableString(schema.status),
+      requesterId: this.ensureString(schema.requesterId, 'Sin solicitante'),
+      assigneeId: this.toNullableString(schema.assigneeId),
+      requester: this.toNullableString(schema.requester),
+      assignee: this.toNullableString(schema.assignee),
+      teamId: this.toNullableString(schema.teamId),
+      duetAt: this.toNullableString(schema.duetAt),
+      resolvedAt: this.toNullableString(schema.resolvedAt),
+      closedAt: this.toNullableString(schema.closedAt),
+      deletedAt: this.toNullableString(schema.deletedAt),
+      createdAt: this.toNullableString(schema.createdAt),
+      updatedAt: this.toNullableString(schema.updatedAt),
+      isResolved: typeof schema.isResolved === 'boolean' ? schema.isResolved : null,
     };
   }
 

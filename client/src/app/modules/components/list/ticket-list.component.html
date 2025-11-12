@@ -1,4 +1,60 @@
 <section class="inbox-container">
+
+  <!-- filtros -->
+  <div class="inbox-filters">
+    <mat-form-field appearance="outline">
+      <mat-label>Buscar</mat-label>
+      <input
+        matInput
+        #q
+        placeholder="Código, solicitante, nota…"
+        (input)="patchFilters('text', q.value)"
+      />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Estado</mat-label>
+      <mat-select multiple [value]="filters().status"
+                  (selectionChange)="patchFilters('status', $event.value)">
+        @for (s of statusOptions(); track s) {
+          <mat-option [value]="s">{{ s }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Tipo</mat-label>
+      <mat-select multiple [value]="filters().request"
+                  (selectionChange)="patchFilters('request', $event.value)">
+        @for (r of requestOptions(); track r) {
+          <mat-option [value]="r">{{ r }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Prioridad</mat-label>
+      <mat-select multiple [value]="filters().priority"
+                  (selectionChange)="patchFilters('priority', $event.value)">
+        @for (p of priorityOptions(); track p) {
+          <mat-option [value]="p">{{ p }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Solicitante</mat-label>
+      <input matInput #rq (input)="patchFilters('requester', rq.value)" />
+    </mat-form-field>
+
+    <button type="button" class="inbox-filter-reset" (click)="resetFilters()">Limpiar</button>
+  </div>
+
+
+
+
+
+
   @if (loading()) {
     <div class="inbox-skeleton" role="presentation" aria-hidden="true">
       <div class="s-row"></div>
@@ -61,7 +117,7 @@
     </div>
     <mat-paginator
       class="inbox-paginator"
-      [length]="tickets().length"
+      [length]="filteredTickets().length"
       [pageIndex]="pageIndex()"
       [pageSize]="pageSize()"
       [pageSizeOptions]="pageSizeOptions"
@@ -69,5 +125,6 @@
       showFirstLastButtons
       aria-label="Paginacion de tickets"
     ></mat-paginator>
+
   }
 </section>
