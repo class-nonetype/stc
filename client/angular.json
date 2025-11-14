@@ -21,8 +21,7 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public",
-
+                "input": "public"
               }
             ],
             "styles": [
@@ -56,6 +55,10 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "host": "0.0.0.0",
+            "port": 8080
+          },
           "configurations": {
             "production": {
               "buildTarget": "stc:build:production"

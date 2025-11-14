@@ -32,7 +32,14 @@
         </p>
       }
 
-      <section class="sidenav-section" formGroupName="general">
+      <mat-horizontal-stepper
+        #ticketStepper
+        class="sidenav-form-stepper"
+        [linear]="true">
+        <mat-step [stepControl]="generalForm">
+          <ng-template matStepLabel>Nota</ng-template>
+
+          <section class="sidenav-section" formGroupName="general">
             <header class="sidenav-section-header">
               <h3 class="sidenav-section-title">Datos generales</h3>
               <p class="sidenav-section-subtitle">Código autogenerado, prioridad y tipo de solicitud.</p>
@@ -168,20 +175,67 @@
                 </section>
               }
             </div>
+          </section>
 
-            <div class="sidenav-step-actions sidenav-step-actions--end">
-              <button mat-button type="button" (click)="onCancel()">Cancelar</button>
-              <span class="sidenav-step-actions-spacer"></span>
-              <button mat-flat-button color="primary" type="submit" [disabled]="submitting()">
-                <mat-icon aria-hidden="true">{{ submitting() ? 'hourglass_top' : 'add_task' }}</mat-icon>
-                {{ submitting() ? 'Creando…' : 'Crear ticket' }}
-              </button>
+          <div class="sidenav-step-actions">
+            <button mat-flat-button color="primary" matStepperNext type="button">
+              Continuar
+              <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+            </button>
+          </div>
+        </mat-step>
+
+        <mat-step [stepControl]="assignmentForm">
+          <ng-template matStepLabel>Asignación</ng-template>
+
+          <section class="sidenav-section" formGroupName="assignment">
+            <header class="sidenav-section-header">
+              <h3 class="sidenav-section-title">Equipo y responsable</h3>
+              <p class="sidenav-section-subtitle">
+                El estado inicial es "En espera" y el equipo predeterminado es Soporte. Define el agente asignado.
+              </p>
+            </header>
+
+            <div class="sidenav-grid">
+              <mat-form-field appearance="outline" class="sidenav-grid-full">
+                <mat-label>Asignar a</mat-label>
+                <mat-select formControlName="assignee_id">
+                  @if (referencesLoading() && !supportUsers().length) {
+                    <mat-option disabled>Cargando agentes…</mat-option>
+                  } @else if (!supportUsers().length) {
+                    <mat-option disabled>No hay agentes disponibles.</mat-option>
+                  } @else {
+                    @for (supportUser of supportUsers(); track supportUser.id) {
+                      <mat-option [value]="supportUser.id">
+                        <div class="sidenav-option">
+                          <span class="sidenav-option-label">{{ userOptionLabel(supportUser) }}</span>
+                        </div>
+                      </mat-option>
+                    }
+                  }
+                </mat-select>
+                <mat-hint>Selecciona la persona responsable.</mat-hint>
+                @if (assignmentForm.get('assignee_id')?.hasError('required')) {
+                  <mat-error>Debes asignar un responsable.</mat-error>
+                }
+              </mat-form-field>
             </div>
           </section>
 
-
-
-
+          <div class="sidenav-step-actions sidenav-step-actions--end">
+            <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+            <span class="sidenav-step-actions-spacer"></span>
+            <button mat-stroked-button color="primary" matStepperPrevious type="button">
+              <mat-icon aria-hidden="true">arrow_back</mat-icon>
+              Anterior
+            </button>
+            <button mat-flat-button color="primary" type="submit" [disabled]="submitting()">
+              <mat-icon aria-hidden="true">{{ submitting() ? 'hourglass_top' : 'add_task' }}</mat-icon>
+              {{ submitting() ? 'Creando…' : 'Crear ticket' }}
+            </button>
+          </div>
+        </mat-step>
+      </mat-horizontal-stepper>
     </form>
   </article>
 </section>

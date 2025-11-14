@@ -26,8 +26,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
   styleUrl: './ticket-creation-form.component.css',
   imports: [
     MatIcon,
-    MatStepper,
-    MatStep,
+    //MatStepper,
+    //MatStep,
     MatFormField,
     MatLabel,
     MatSelect,
@@ -61,6 +61,7 @@ export class AppTicketCreationFormComponent {
   readonly priorityTypes = this.ticketService.priorityTypes;
   readonly statusTypes = this.ticketService.statusTypes;
   readonly supportUsers = this.ticketService.supportUsers;
+
   readonly referencesLoading = this.ticketService.loading;
   readonly referencesHasError = this.ticketService.hasError;
 
@@ -79,13 +80,13 @@ export class AppTicketCreationFormComponent {
     note: ['', [Validators.maxLength(1000)]],
   });
 
-  readonly assignmentForm = this.formBuilder.nonNullable.group({
-    assignee_id: ['', Validators.required],
-  });
+  //readonly assignmentForm = this.formBuilder.nonNullable.group({
+  //  assignee_id: ['', Validators.required],
+  //});
 
   readonly ticketForm = this.formBuilder.group({
     general: this.generalForm,
-    assignment: this.assignmentForm,
+    //assignment: this.assignmentForm,
   });
 
 
@@ -112,10 +113,10 @@ export class AppTicketCreationFormComponent {
       this.toggleControlDisabled(this.generalForm.get('priority_type_id'), disable);
     });
 
-    effect(() => {
-      const disable = this.referencesLoading() && !this.supportUsers().length;
-      this.toggleControlDisabled(this.assignmentForm.get('assignee_id'), disable);
-    });
+    //effect(() => {
+    //  const disable = this.referencesLoading() && !this.supportUsers().length;
+    //  this.toggleControlDisabled(this.assignmentForm.get('assignee_id'), disable);
+    //});
   }
 
 
@@ -144,7 +145,7 @@ export class AppTicketCreationFormComponent {
     }
 
     const general = this.generalForm.getRawValue();
-    const assignment = this.assignmentForm.getRawValue();
+    //const assignment = this.assignmentForm.getRawValue();
 
     const requesterId = this.getCurrentRequesterId();
     if (!requesterId) {
@@ -164,11 +165,11 @@ export class AppTicketCreationFormComponent {
       return;
     }
 
-    const assigneeId = assignment.assignee_id?.trim();
-    if (!assigneeId) {
-      this.setFormError('Debes asignar un responsable antes de enviar.');
-      return;
-    }
+    //const assigneeId = assignment.assignee_id?.trim();
+    //if (!assigneeId) {
+    //  this.setFormError('Debes asignar un responsable antes de enviar.');
+    //  return;
+    //}
 
     const formData = new FormData();
     formData.append('code', general.code.trim());
@@ -178,12 +179,12 @@ export class AppTicketCreationFormComponent {
     formData.append('status_type_id', statusId);
     formData.append('requester_id', requesterId);
     formData.append('team_id', teamId);
-    formData.append('assignee_id', assigneeId);
+    //formData.append('assignee_id', assigneeId);
 
     this.attachments().forEach(file => formData.append('attachments', file));
 
     this.submitting.set(true);
-    this.ticketService.createTicket(formData).subscribe({
+    this.ticketService.postTicket(formData).subscribe({
       next: () => {
         this.ticketService.getAllTickets({ silent: true });
         this.submitting.set(false);
@@ -312,12 +313,14 @@ export class AppTicketCreationFormComponent {
       priority_type_id: preserveSelections ? this.generalForm.get('priority_type_id')?.value ?? '' : '',
       note: '',
     });
-    this.assignmentForm.reset({
-      assignee_id: preserveSelections ? this.assignmentForm.get('assignee_id')?.value ?? '' : '',
-    });
+
+    //this.assignmentForm.reset({
+    //  assignee_id: preserveSelections ? this.assignmentForm.get('assignee_id')?.value ?? '' : '',
+    //});
+
     this.attachments.set([]);
     this.dropzoneActive.set(false);
-    this.stepper?.reset();
+    //this.stepper?.reset();
   }
 
   private assignNewCode(): void {

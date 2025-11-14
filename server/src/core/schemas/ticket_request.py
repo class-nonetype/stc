@@ -13,7 +13,7 @@ class TicketRequest(BaseModel):
     priority_type_id: UUID
     status_type_id: UUID
     requester_id: UUID
-    assignee_id: UUID
+    #assignee_id: UUID
     team_id: UUID | None = None
 
     due_at: datetime | None = None

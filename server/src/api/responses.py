@@ -21,22 +21,14 @@ def _stringify_uuids(obj):
     return obj
 
 
-def response(response_type: int, **kwargs) -> (Response
-                                               | JSONResponse
-                                               | StreamingResponse
-                                               | FileResponse
-                                               | None):
+def response(response_type: int, **kwargs) -> (Response | JSONResponse | StreamingResponse | FileResponse | None):
+    if 'content' in kwargs:
+        kwargs = kwargs.copy()
+        kwargs['content'] = _stringify_uuids(kwargs['content'])
+
     match response_type:
-      case 1:
-        return Response(**kwargs)
-      case 2:
-        if "content" in kwargs:
-            kwargs = kwargs.copy()
-            kwargs["content"] = _stringify_uuids(kwargs["content"])
-        return JSONResponse(**kwargs)
-      case 3:
-        return StreamingResponse(**kwargs)
-      case 4:
-        return FileResponse(**kwargs)
-      case _:
-        return None
+      case 1: return Response(**kwargs)
+      case 2: return JSONResponse(**kwargs)
+      case 3: return StreamingResponse(**kwargs)
+      case 4: return FileResponse(**kwargs)
+      case _: return None

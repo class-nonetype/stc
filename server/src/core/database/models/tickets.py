@@ -54,8 +54,9 @@ class Tickets(Base):
         nullable=False,
         index=True,
     )
-
-    assignee_id: Mapped[uuid.UUID | None] = mapped_column(
+    
+    # encargado
+    manager_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("user_accounts.id", ondelete="SET NULL"),
         nullable=True,

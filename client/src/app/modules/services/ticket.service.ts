@@ -219,10 +219,10 @@ export class TicketService {
 
 
     if (role === 'Asesoría') {
-      return endpoints.tickets.byRequester(userId);
+      return endpoints.tickets.getAllTicketsByRequesterUserId(userId);
     }
     if (role === 'Soporte') {
-      return endpoints.tickets.byAssignee(userId);
+      return endpoints.tickets.getAllTicketsByManagerUser;
     }
     return null;
   }
@@ -231,10 +231,10 @@ export class TicketService {
     const role = this.authentication.getCurrentUserTeam();
 
     if (role === 'Asesoría') {
-      return endpoints.tickets.countByRequester(userId);
+      return endpoints.tickets.getTotalTicketsByRequesterUserId(userId);
     }
     if (role === 'Soporte') {
-      return endpoints.tickets.countByAssignee(userId);
+      return endpoints.tickets.getTotalTicketsByManagerUser;
     }
     return null;
   }
@@ -243,13 +243,13 @@ export class TicketService {
 
 
 
-  createTicket(payload: TicketCreateRequest | FormData): Observable<Ticket> {
+  postTicket(payload: TicketCreateRequest | FormData): Observable<Ticket> {
     this.hasError.set(false);
 
     const body = payload instanceof FormData ? payload : this.toFormData(payload);
 
     return this.http
-      .post<TicketResponse>(`${environment.apiUrl}/${endpoints.tickets.create}`, body)
+      .post<TicketResponse>(`${environment.apiUrl}/${endpoints.tickets.postTicket}`, body)
       .pipe(
         map(schema => this.mapToTicket(schema, this.tickets().length)),
         tap(ticket => {
@@ -333,9 +333,9 @@ export class TicketService {
       statusTypeId: this.toNullableString(schema.statusTypeId),
       status: this.toNullableString(schema.status),
       requesterId: this.ensureString(schema.requesterId, 'Sin solicitante'),
-      assigneeId: this.toNullableString(schema.assigneeId),
+      //assigneeId: this.toNullableString(schema.assigneeId),
       requester: this.toNullableString(schema.requester),
-      assignee: this.toNullableString(schema.assignee),
+      //assignee: this.toNullableString(schema.assignee),
       teamId: this.toNullableString(schema.teamId),
       duetAt: this.toNullableString(schema.duetAt),
       resolvedAt: this.toNullableString(schema.resolvedAt),
@@ -359,9 +359,9 @@ export class TicketService {
       statusTypeId: null,
       status: null,
       requesterId: 'unknown',
-      assigneeId: null,
+      //assigneeId: null,
       requester: null,
-      assignee: null,
+      //assignee: null,
       teamId: null,
       duetAt: null,
       resolvedAt: null,

@@ -39,7 +39,8 @@
 }
 
 .app-shell-toolbar {
-  height: 64px !important;
+  height: var(--shell-header-height) !important;
+  min-height: var(--shell-header-height) !important;
   position: sticky;
   top: 0;
   z-index: 1;

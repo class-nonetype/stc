@@ -113,9 +113,9 @@ export interface Ticket {
   statusTypeId: string | null;
   status: string | null;
   requesterId: string;
-  assigneeId: string | null;
+  //assigneeId: string | null;
   requester: string | null;
-  assignee: string | null;
+  //assignee: string | null;
   teamId: string | null;
   duetAt: string | null;
   resolvedAt: string | null;
@@ -170,9 +170,9 @@ export type TicketResponse = {
   statusTypeId?: string | null;
   status?: string | null;
   requesterId?: string;
-  assigneeId?: string | null;
+  //assigneeId?: string | null;
   requester?: string | null;
-  assignee?: string | null;
+  //assignee?: string | null;
   teamId?: string | null;
   duetAt?: string | null;
   resolvedAt?: string | null;

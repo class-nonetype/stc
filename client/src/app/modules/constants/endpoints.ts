@@ -12,13 +12,13 @@ export const endpoints = {
   },
 
   tickets: {
-    base: `${applicationRoute}/tickets`,
-    create: `${applicationRoute}/create/ticket`,
-    byId: (ticketId: string) => `ticket/${ticketId}`,
-    byRequester: (requesterId: string) => `${applicationRoute}/select/all/tickets/requester/${requesterId}`,
-    byAssignee: (assigneeId: string) => `${applicationRoute}/select/all/tickets/assignee/${assigneeId}`,
-    countByRequester: (requesterId: string) => `${applicationRoute}/select/total/tickets/requester/${requesterId}`,
-    countByAssignee: (assigneeId: string) => `${applicationRoute}/select/total/tickets/assignee/${assigneeId}`,
+    postTicket: `${applicationRoute}/create/ticket`,
+    getAllTicketsByRequesterUserId: (requesterId: string) => `${applicationRoute}/select/all/tickets/requester/${requesterId}`,
+    //byAssignee: (assigneeId: string) => `${applicationRoute}/select/all/tickets/assignee/${assigneeId}`,
+    getAllTicketsByManagerUser: `${applicationRoute}/select/all/tickets/manager`,
+    getTotalTicketsByRequesterUserId: (requesterId: string) => `${applicationRoute}/select/total/tickets/requester/${requesterId}`,
+    //countByAssignee: (assigneeId: string) => `${applicationRoute}/select/total/tickets/assignee/${assigneeId}`,
+    getTotalTicketsByManagerUser: `${applicationRoute}/select/total/tickets/manager`
   },
 
   userTeam: {
@@ -26,10 +26,10 @@ export const endpoints = {
   },
 
   types: {
-    requestTypes: `${applicationRoute}/select/all/request-types`,
-    priorityTypes: `${applicationRoute}/select/all/priority-types`,
-    statusTypes: `${applicationRoute}/select/all/status-types`,
-    supportUsers: `${applicationRoute}/select/all/support-users`,
+    requestTypes: `${applicationRoute}/select/all/types/request`,
+    priorityTypes: `${applicationRoute}/select/all/types/priority`,
+    statusTypes: `${applicationRoute}/select/all/types/status`,
+    supportUsers: `${applicationRoute}/select/all/users/support`,
   }
 
 
