@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { Ticket } from '../../interfaces/ticket.interface';
+import { AuthenticationSessionService } from '../../services/authentication.service';
 
 @Component({
   selector: 'ticket-list-item',
@@ -13,6 +14,13 @@ import { Ticket } from '../../interfaces/ticket.interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TicketListItemComponent {
+
+  private readonly authenticationService = inject(AuthenticationSessionService);
+
+  readonly userIsAuthenticated: boolean = this.authenticationService.isAuthenticated();
+  readonly userTeam = this.authenticationService.getCurrentUserTeam();
+
+
   readonly ticket: Ticket = inject<Ticket>(MAT_DIALOG_DATA);
   private readonly dialogRef = inject(MatDialogRef<TicketListItemComponent>);
 

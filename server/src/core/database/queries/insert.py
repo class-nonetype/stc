@@ -28,6 +28,7 @@ async def insert_ticket(session: AsyncSession, schema: TicketRequest) -> Tickets
             'priority_type_id': schema.priority_type_id,
             'status_type_id': schema.status_type_id,
             'requester_id': schema.requester_id,
+            'assignee_id': schema.assignee_id,
             'team_id': schema.team_id,
 
             'due_at': schema.due_at,

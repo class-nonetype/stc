@@ -1,6 +1,6 @@
 
 // src/app/features/home/home.page.ts
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatGridListModule } from '@angular/material/grid-list';
@@ -50,12 +50,14 @@ interface HomeOption {
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomePage {
+export class HomePage implements OnInit, OnDestroy {
   private readonly userSession = inject(AuthenticationSessionService);
   private readonly ticketService = inject(TicketService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   readonly userIsAuthenticated = this.userSession.isAuthenticated;
-  readonly userFullName = this.userSession.getCurrentUserFullName() ?? 'Usuario';
+  readonly userFullName = this.userSession.getCurrentUserFullName();
+  readonly userTeam = this.userSession.getCurrentUserTeam();
 
   private readonly form = inject(FormService);
   private readonly router = inject(Router);
@@ -80,7 +82,16 @@ export class HomePage {
 
   ticketCount: TicketCounts = { opened: 0, inProgress: 0, onHold: 0, closed: 0, cancelled: 0, finished: 0 };
 
-  options: HomeOption[] = [
+  private readonly supportBaseOptions: HomeOption[] = [
+    {
+      icon: 'confirmation_number',
+      label: 'Tickets solicitados',
+      subtitle: 'Visualice las solicitudes que han sido emitidas.',
+      click: () => this.router.navigate(['/tickets'])
+    },
+  ];
+
+  private readonly advisorBaseOptions: HomeOption[] = [
     {
       icon: 'person',
       iconBadge: 'speaker_notes',
@@ -96,20 +107,41 @@ export class HomePage {
     },
   ];
 
-  x = [];
+  supportUserOptions: HomeOption[] = [...this.supportBaseOptions];
+  advisorUserOptions: HomeOption[] = [...this.advisorBaseOptions];
 
 
-  constructor() { this.loadTicketCount();}
+
+  private readonly syncTicketCounts = effect(() => {
+    const authenticated = this.userIsAuthenticated();
+    const ticketsSnapshot = this.ticketService.tickets();
+    if (!authenticated) {
+      return;
+    }
+    // Trigger whenever the ticket collection is refreshed.
+    void ticketsSnapshot;
+    this.loadTicketCount();
+  });
+
+  ngOnInit(): void {
+    this.resetBaseOptions();
+    this.ticketService.enableRealtimeUpdates();
+    this.loadTicketCount();
+  }
+
+  ngOnDestroy(): void {
+    this.ticketService.disableRealtimeUpdates();
+  }
 
 
   private loadTicketCount(): void {
-    const requesterId = this.userSession.getCurrentUserId();
-    if (!requesterId) return;
+    const userId = this.userSession.getCurrentUserId();
+    if (!userId) return;
 
     const statusTypes = Object.keys(this.statusMap);
 
     const requests = statusTypes.map(st =>
-      this.ticketService.getCountTicketsByRequesterId(requesterId, st)
+      this.ticketService.getCountTicketsByUserId(userId, st)
         .pipe(map(count => ({ st, count })))
     );
 
@@ -119,7 +151,7 @@ export class HomePage {
           const key = this.statusMap[st];
           this.ticketCount[key] = count;
         }
-        this.updateOptions(); // ahora sí, ya tienes los números
+        this.updateOptions();
         console.log('ticketCount listo:', this.ticketCount);
       },
       error: err => console.error('No se pudieron cargar los conteos', err),
@@ -127,47 +159,42 @@ export class HomePage {
   }
 
   private updateOptions() {
-    this.options.push(
+    const statsOptions: HomeOption[] = [
       {
         icon: 'schedule',
         label: 'Tickets en espera',
         subtitle: '',
         value: this.ticketCount.onHold,
-        click: () => console.log('Tickets finalizados clicked')
+        click: () => console.log('Tickets en espera clicked')
       },
-
       {
         icon: 'pending',
         label: 'Tickets en proceso',
         subtitle: '',
         value: this.ticketCount.inProgress,
-        click: () => console.log('Tickets finalizados clicked')
+        click: () => console.log('Tickets en proceso clicked')
       },
-
       {
         icon: 'visibility',
         label: 'Tickets abiertos',
         subtitle: '',
         value: this.ticketCount.opened,
-        click: () => console.log('Tickets finalizados clicked')
+        click: () => console.log('Tickets abiertos clicked')
       },
-
       {
         icon: 'cancel',
         label: 'Tickets cerrados',
         subtitle: '',
         value: this.ticketCount.closed,
-        click: () => console.log('Tickets finalizados clicked')
+        click: () => console.log('Tickets cerrados clicked')
       },
-
       {
         icon: 'error',
         label: 'Tickets cancelados',
         subtitle: '',
         value: this.ticketCount.cancelled,
-        click: () => console.log('Tickets finalizados clicked')
+        click: () => console.log('Tickets cancelados clicked')
       },
-
       {
         icon: 'task_alt',
         label: 'Tickets finalizados',
@@ -175,8 +202,28 @@ export class HomePage {
         value: this.ticketCount.finished,
         click: () => console.log('Tickets finalizados clicked')
       },
-    );
+    ];
+
+    if (this.isSupportUser()) {
+      this.supportUserOptions = [...this.supportBaseOptions];
+      this.advisorUserOptions = [...this.advisorBaseOptions];
+    } else {
+      this.supportUserOptions = [...this.supportBaseOptions];
+      this.advisorUserOptions = [...this.advisorBaseOptions, ...statsOptions];
+    }
+    this.cdr.markForCheck();
   }
+
+  private resetBaseOptions(): void {
+    this.supportUserOptions = [...this.supportBaseOptions];
+    this.advisorUserOptions = [...this.advisorBaseOptions];
+  }
+
+  private isSupportUser(): boolean {
+    const team = this.userSession.getCurrentUserTeam();
+    return (team ?? '').toLowerCase() === 'soporte';
+  }
+
 
 
   openForm(event?: Event) {

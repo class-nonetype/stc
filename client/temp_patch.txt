@@ -1,0 +1,10 @@
+*** Begin Patch
+*** Update File: src/app/modules/pages/home/home.component.html
+@@
+-    @if (userTeam === 'AsesorA-a') {
++    @if ((userSession.getCurrentUserTeam()?.toLowerCase() ?? '') !== 'soporte') {
+@@
+-    } @else if (userTeam === 'Soporte') {
++    } @else {
+*** End Patch
+

@@ -4,58 +4,87 @@
       <h1 class="dashboard-title">Bienvenid@ {{ userFullName }}</h1>
       <p class="dashboard-subtitle">This is the main dashboard area.</p>
     </div>
-    <!--
-    <button
-      type="button"
-      class="creation-form"
-      matButton="elevated"
-      mat-stroked-button
-      color="primary"
-      (click)="openForm()">
-      <mat-icon aria-hidden="true">add</mat-icon>
-      Nuevo reporte
-    </button>
-    -->
+
   </header>
 
   <section class="dashboard-cards">
 
-    @for (dashboardOption of options; track dashboardOption.label) {
-      <mat-card
-        class="dashboard-option-card"
-        role="button"
-        tabindex="0"
-        (click)="dashboardOption.click()">
-        <div class="dashboard-option-icon" aria-hidden="true">
-          <mat-icon class="dashboard-option-icon-main">{{ dashboardOption.icon }}</mat-icon>
-          @if (dashboardOption.iconBadge){
-            <span class="dashboard-option-icon-badge">
-              <mat-icon>speaker_notes</mat-icon>
-            </span>
-          }
-
-        </div>
-        <div class="dashboard-option-content">
-          <h3>{{ dashboardOption.label }}</h3>
-
-          @if ( dashboardOption.subtitle ){
-            <p>{{ dashboardOption.subtitle }}</p>
-          }
-
-          @if ((dashboardOption.value !== undefined && dashboardOption.value !== null) ){
-
-            @if ( dashboardOption.value == 0 ) {
-              <!-- <strong class="dashboard-card-value">Aún no ha finalizado ningún ticket.</strong> -->
-              <p>Aún no hay avance en el ticket.</p>
-            } @else {
-              <strong class="dashboard-card-value">{{ dashboardOption.value }}</strong>
-              <!-- <span class="dashboard-card-trend">{{ dashboardOption.trend }}</span> -->
+    @if ( userTeam === 'Asesoría' ) {
+      @for (dashboardOption of advisorUserOptions; track dashboardOption.label) {
+        <mat-card
+          class="dashboard-option-card"
+          role="button"
+          tabindex="0"
+          (click)="dashboardOption.click()">
+          <div class="dashboard-option-icon" aria-hidden="true">
+            <mat-icon class="dashboard-option-icon-main">{{ dashboardOption.icon }}</mat-icon>
+            @if (dashboardOption.iconBadge){
+              <span class="dashboard-option-icon-badge">
+                <mat-icon>speaker_notes</mat-icon>
+              </span>
             }
 
-          }
-        </div>
-      </mat-card>
+          </div>
+          <div class="dashboard-option-content">
+            <h3>{{ dashboardOption.label }}</h3>
+
+            @if ( dashboardOption.subtitle ){
+              <p>{{ dashboardOption.subtitle }}</p>
+            }
+
+            @if ((dashboardOption.value !== undefined && dashboardOption.value !== null) ){
+
+              @if ( dashboardOption.value == 0 ) {
+                <!-- <strong class="dashboard-card-value">Aún no ha finalizado ningún ticket.</strong> -->
+                <p>Aún no hay avance en el ticket.</p>
+              } @else {
+                <strong class="dashboard-card-value">{{ dashboardOption.value }}</strong>
+                <!-- <span class="dashboard-card-trend">{{ dashboardOption.trend }}</span> -->
+              }
+
+            }
+          </div>
+        </mat-card>
+      }
+    } @else if ( userTeam === 'Soporte' ) {
+      @for (dashboardOption of supportUserOptions; track dashboardOption.label) {
+        <mat-card
+          class="dashboard-option-card"
+          role="button"
+          tabindex="0"
+          (click)="dashboardOption.click()">
+          <div class="dashboard-option-icon" aria-hidden="true">
+            <mat-icon class="dashboard-option-icon-main">{{ dashboardOption.icon }}</mat-icon>
+            @if (dashboardOption.iconBadge){
+              <span class="dashboard-option-icon-badge">
+                <mat-icon>speaker_notes</mat-icon>
+              </span>
+            }
+
+          </div>
+          <div class="dashboard-option-content">
+            <h3>{{ dashboardOption.label }}</h3>
+
+            @if ( dashboardOption.subtitle ){
+              <p>{{ dashboardOption.subtitle }}</p>
+            }
+
+            @if ((dashboardOption.value !== undefined && dashboardOption.value !== null) ){
+
+              @if ( dashboardOption.value == 0 ) {
+                <!-- <strong class="dashboard-card-value">Aún no ha finalizado ningún ticket.</strong> -->
+                <p>Aún no hay avance en el ticket.</p>
+              } @else {
+                <strong class="dashboard-card-value">{{ dashboardOption.value }}</strong>
+                <!-- <span class="dashboard-card-trend">{{ dashboardOption.trend }}</span> -->
+              }
+
+            }
+          </div>
+        </mat-card>
+      }
     }
+
 
 
   </section>

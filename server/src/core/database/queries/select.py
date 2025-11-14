@@ -200,36 +200,6 @@ async def select_all_tickets_by_requester_id(session: AsyncSession, requester_id
     )
     result = await session.execute(statement)
     object_models = result.scalars().all()
-    
-    '''
-    data = []
-    for object_model in object_models:
-        data.append({
-            'id': object_model.id,
-            'code': object_model.code,
-            'note': object_model.note,
-            'requestTypeId': object_model.request_type_id,
-            'request': await select_request_type_description_by_id(session=session, request_type_id=object_model.request_type_id),  # si es async
-            'priorityTypeId': object_model.priority_type_id,
-            'priority': await select_priority_type_description_by_id(session=session, priority_type_id=object_model.priority_type_id),
-            'statusTypeId': object_model.status_type_id,
-            'status': await select_status_type_description_by_id(session=session, status_type_id=object_model.status_type_id),
-            'requesterId': object_model.requester_id,
-            'assigneeId': object_model.assignee_id,
-            'requester': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.requester_id),
-            'assignee': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.assignee_id) if object_model.assignee_id else None,
-            'teamId': object_model.team_id,
-            'duetAt': object_model.due_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.due_at is not None else None,
-            'resolvedAt': object_model.resolved_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.resolved_at is not None else None,
-            'closedAt': object_model.closed_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.closed_at is not None else None,
-            'deletedAt': object_model.deleted_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.deleted_at is not None else None,
-            'createdAt': object_model.created_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.created_at is not None else None,
-            'updatedAt': object_model.updated_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.updated_at is not None else None,
-            'isResolved': object_model.is_resolved,
-            'attachments': []
-        })
-    '''
-
     data = [
         {
             'id': object_model.id,
@@ -257,8 +227,48 @@ async def select_all_tickets_by_requester_id(session: AsyncSession, requester_id
         } for object_model in object_models
     ]
     
+    return data
+
+
+async def select_all_tickets_by_assignee_id(session: AsyncSession, assignee_id: UUID):
+    statement = (
+        select(Tickets)
+        .where(
+            Tickets.assignee_id == assignee_id,
+            Tickets.is_active.is_(True),  # mejor que == True
+        )
+    )
+    result = await session.execute(statement)
+    object_models = result.scalars().all()
+    data = [
+        {
+            'id': object_model.id,
+            'code': object_model.code,
+            'note': object_model.note,
+            'requestTypeId': object_model.request_type_id,
+            'request': await select_request_type_description_by_id(session=session, request_type_id=object_model.request_type_id),  # si es async
+            'priorityTypeId': object_model.priority_type_id,
+            'priority': await select_priority_type_description_by_id(session=session, priority_type_id=object_model.priority_type_id),
+            'statusTypeId': object_model.status_type_id,
+            'status': await select_status_type_description_by_id(session=session, status_type_id=object_model.status_type_id),
+            'requesterId': object_model.requester_id,
+            'assigneeId': object_model.assignee_id,
+            'requester': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.requester_id),
+            'assignee': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.assignee_id) if object_model.assignee_id else None,
+            'teamId': object_model.team_id,
+            'duetAt': object_model.due_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.due_at is not None else None,
+            'resolvedAt': object_model.resolved_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.resolved_at is not None else None,
+            'closedAt': object_model.closed_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.closed_at is not None else None,
+            'deletedAt': object_model.deleted_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.deleted_at is not None else None,
+            'createdAt': object_model.created_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.created_at is not None else None,
+            'updatedAt': object_model.updated_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.updated_at is not None else None,
+            'isResolved': object_model.is_resolved,
+            'attachments': []
+        } for object_model in object_models
+    ]
     
     return data
+
 
 
 async def select_all_finished_tickets_by_requester_id(session: AsyncSession, requester_id: UUID):
@@ -318,6 +328,38 @@ async def select_count_tickets_by_requester_id(session: AsyncSession, requester_
     data = {'count': len(object_models) if object_models else 0}
     
     return data
+
+
+async def select_count_tickets_by_assignee_id(session: AsyncSession, assignee_id: UUID, status: str) -> int:
+    statement = (
+        select(Tickets)
+        .select_from(Tickets)
+        .join(StatusTypes, StatusTypes.id == Tickets.status_type_id)
+        .where(
+            Tickets.assignee_id == assignee_id,
+            StatusTypes.description == status
+        )
+    )
+    result = await session.execute(statement)
+    object_models = result.scalars().all()
+
+    data = {'count': len(object_models) if object_models else 0}
+    
+    return data
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

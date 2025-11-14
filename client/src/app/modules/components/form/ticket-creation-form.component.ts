@@ -51,7 +51,7 @@ export class AppTicketCreationFormComponent {
   readonly sidenavState = inject(FormService);
 
   private readonly formBuilder = inject(FormBuilder);
-  private readonly authentication = inject(AuthenticationSessionService);
+  private readonly authenticationService = inject(AuthenticationSessionService);
   private readonly ticketService = inject(TicketService);
   private readonly teamService = inject(TeamService);
 
@@ -90,7 +90,7 @@ export class AppTicketCreationFormComponent {
 
 
   constructor() {
-    this.ticketService.loadLevelTypes();
+    this.ticketService.getAllLevelTypes();
     this.teamService.loadTeams();
 
     effect(() => {
@@ -165,6 +165,10 @@ export class AppTicketCreationFormComponent {
     }
 
     const assigneeId = assignment.assignee_id?.trim();
+    if (!assigneeId) {
+      this.setFormError('Debes asignar un responsable antes de enviar.');
+      return;
+    }
 
     const formData = new FormData();
     formData.append('code', general.code.trim());
@@ -174,14 +178,14 @@ export class AppTicketCreationFormComponent {
     formData.append('status_type_id', statusId);
     formData.append('requester_id', requesterId);
     formData.append('team_id', teamId);
-    this.appendIfValue(formData, 'assignee_id', assigneeId);
+    formData.append('assignee_id', assigneeId);
 
     this.attachments().forEach(file => formData.append('attachments', file));
 
     this.submitting.set(true);
     this.ticketService.createTicket(formData).subscribe({
       next: () => {
-        this.ticketService.loadTickets();
+        this.ticketService.getAllTickets({ silent: true });
         this.submitting.set(false);
         this.submitSuccess.set(true);
         this.resetForm(true);
@@ -341,13 +345,6 @@ export class AppTicketCreationFormComponent {
     this.attachments.update(previous => [...previous, ...incoming]);
   }
 
-  private appendIfValue(formData: FormData, key: string, value?: string | null): void {
-    if (!value) {
-      return;
-    }
-    formData.append(key, value);
-  }
-
   private setFormError(message: string): void {
     this.formErrorMessage.set(message);
   }
@@ -364,7 +361,7 @@ export class AppTicketCreationFormComponent {
   }
 
   private getCurrentRequesterId(): string | null {
-    return this.authentication.getCurrentUserId();
+    return this.authenticationService.getCurrentUserId();
   }
 
   private getDefaultStatusId(): string | null {

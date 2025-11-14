@@ -15,8 +15,10 @@ export const endpoints = {
     base: `${applicationRoute}/tickets`,
     create: `${applicationRoute}/create/ticket`,
     byId: (ticketId: string) => `ticket/${ticketId}`,
-    byRequester: (requesterId: string) => `${applicationRoute}/select/all/tickets/${requesterId}`,
-    countByRequester: (requesterId: string) => `${applicationRoute}/select/total/tickets/${requesterId}`,
+    byRequester: (requesterId: string) => `${applicationRoute}/select/all/tickets/requester/${requesterId}`,
+    byAssignee: (assigneeId: string) => `${applicationRoute}/select/all/tickets/assignee/${assigneeId}`,
+    countByRequester: (requesterId: string) => `${applicationRoute}/select/total/tickets/requester/${requesterId}`,
+    countByAssignee: (assigneeId: string) => `${applicationRoute}/select/total/tickets/assignee/${assigneeId}`,
   },
 
   userTeam: {

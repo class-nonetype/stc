@@ -1,6 +1,6 @@
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { type Ticket } from '../../interfaces/ticket.interface';
 import { TicketService } from '../../services/ticket.service';
@@ -16,7 +16,7 @@ import { AuthenticationSessionService } from '../../services/authentication.serv
   styleUrl: './tickets.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TicketInboxPageComponent {
+export class TicketInboxPageComponent implements OnInit, OnDestroy {
   private readonly userSession = inject(AuthenticationSessionService);
   readonly userIsAuthenticated = this.userSession.isAuthenticated;
 
@@ -32,10 +32,15 @@ export class TicketInboxPageComponent {
   readonly cards = computed<Ticket[]>(() => this.ticketService.tickets());
   readonly hasTickets = computed(() => this.cards().length > 0);
 
-  constructor(public session: AuthenticationSessionService) {
-    if (!this.ticketService.tickets().length && !this.ticketService.loading()) {
-      this.ticketService.loadTickets();
-    }
+  constructor(public session: AuthenticationSessionService) {}
+
+  ngOnInit(): void {
+    this.ticketService.enableRealtimeUpdates();
+    this.ticketService.getAllTickets();
+  }
+
+  ngOnDestroy(): void {
+    this.ticketService.disableRealtimeUpdates();
   }
 
   onOpen(card: Ticket): void {
@@ -56,7 +61,7 @@ export class TicketInboxPageComponent {
   }
 
   onRetry(): void {
-    this.ticketService.loadTickets();
+    this.ticketService.getAllTickets();
   }
 
 }

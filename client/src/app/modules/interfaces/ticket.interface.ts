@@ -92,11 +92,12 @@ const STATUS_KEY_BY_STRING: Record<string, TicketStatusKey> = {
 
 export const normalizeTicketStatusKey = (value: string | null | undefined): TicketStatusKey | null => {
   if (!value) return null;
+
   const normalized = value.trim().toLowerCase();
   const direct = STATUS_KEY_BY_STRING[normalized];
-  if (direct) {
-    return direct;
-  }
+
+  if (direct) return direct;
+
   const slug = normalized.replace(/\s+/g, '_');
   return STATUS_KEY_BY_STRING[slug] ?? null;
 };

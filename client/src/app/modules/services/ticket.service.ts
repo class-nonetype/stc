@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+﻿import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '@environments/environment';
 import { endpoints } from '../constants/endpoints';
@@ -17,6 +17,9 @@ interface ApiCollectionResponse<T> {
 export class TicketService {
   private readonly http = inject(HttpClient);
   private readonly authentication = inject(AuthenticationSessionService);
+  private readonly refreshIntervalMs = 10000;
+  private refreshIntervalId: ReturnType<typeof setInterval> | null = null;
+  private refreshSubscribers = 0;
 
   readonly tickets = signal<Ticket[]>([]);
 
@@ -28,55 +31,71 @@ export class TicketService {
   readonly loading = signal<boolean>(false);
   readonly hasError = signal<boolean>(false);
 
-  loadLevelTypes(): void {
+  getAllLevelTypes(): void {
+
+    // comprueba que el arreglo devuelto por los tipos
+    // no esté vacío (un número distinto de 0 se evalúa como true
     if (
       this.requestTypes().length &&
       this.priorityTypes().length &&
       this.statusTypes().length &&
       this.supportUsers().length &&
+
+      // comprueba que no haya errores
       !this.hasError()
-    ) {
-      return;
-    }
+    ) return;
 
-    if (this.loading()) {
-      return;
-    }
+    if (this.loading()) return;
 
+    // cambia los estados reactivos
     this.loading.set(true);
     this.hasError.set(false);
 
+
+    // esta variable se usará para marcar si alguna de las peticiones falla.
     let encounteredError = false;
 
+
+    // llamada de todos los endpoints en paralelo (al mismo tiempo)
     forkJoin({
-      requestTypes: this.fetchTicketTypes(endpoints.types.requestTypes).pipe(
+      requestTypes: this.getAllTicketTypes(endpoints.types.requestTypes).pipe(
         catchError(error => {
           console.error('Failed to load request types', error);
           encounteredError = true;
+
+          // retorna un arreglo vacio
           return of([] as LevelType[]);
         }),
       ),
-      priorityTypes: this.fetchTicketTypes(endpoints.types.priorityTypes).pipe(
+      priorityTypes: this.getAllTicketTypes(endpoints.types.priorityTypes).pipe(
         catchError(error => {
           console.error('Failed to load priority types', error);
           encounteredError = true;
+
+          // retorna un arreglo vacio
           return of([] as LevelType[]);
         }),
       ),
-      statusTypes: this.fetchTicketTypes(endpoints.types.statusTypes).pipe(
+      statusTypes: this.getAllTicketTypes(endpoints.types.statusTypes).pipe(
         catchError(error => {
           console.error('Failed to load status types', error);
           encounteredError = true;
+
+          // retorna un arreglo vacio
           return of([] as LevelType[]);
         }),
       ),
-      supportUsers: this.fetchSupportUsers().pipe(
+      supportUsers: this.getAllSupportUsers().pipe(
         catchError(error => {
           console.error('Failed to load support users', error);
           encounteredError = true;
+
+          // retorna un arreglo vacio
           return of([] as SupportUser[]);
         }),
       ),
+
+    // cuando todo termine, se cargan los signals
     }).subscribe({
       next: ({ requestTypes, priorityTypes, statusTypes, supportUsers }) => {
         this.requestTypes.set(requestTypes);
@@ -99,13 +118,13 @@ export class TicketService {
     });
   }
 
-  private fetchTicketTypes(endpoint: string) {
+  private getAllTicketTypes(endpoint: string) {
     return this.http
       .get<ApiCollectionResponse<LevelType>>(`${environment.apiUrl}/${endpoint}`)
       .pipe(map(response => (Array.isArray(response?.data) ? response.data : [])));
   }
 
-  private fetchSupportUsers() {
+  private getAllSupportUsers() {
     return this.http
       .get<ApiCollectionResponse<SupportUser>>(
         `${environment.apiUrl}/${endpoints.types.supportUsers}`,
@@ -116,47 +135,70 @@ export class TicketService {
 
 
 
-  loadTickets(): void {
-    const requesterId = this.authentication.getCurrentUserId();
-    if (!requesterId) {
+  getAllTickets(options?: { silent?: boolean }): void {
+    const silent = options?.silent ?? false;
+    const userId = this.authentication.getCurrentUserId();
+    if (!userId) {
       this.hasError.set(true);
       console.warn('No requester id found for the current session.');
       return;
     }
 
-    const url = `${environment.apiUrl}/${endpoints.tickets.byRequester(requesterId)}`;
+    const endpointPath = this.getTicketsEndpointForTeam(userId);
+    if (!endpointPath) {
+      this.hasError.set(true);
+      console.warn('No ticket endpoint available for the current team.');
+      return;
+    }
 
-    this.loading.set(true);
-    this.hasError.set(false);
+    const url = `${environment.apiUrl}/${endpointPath}`;
+
+    if (!silent) {
+      this.loading.set(true);
+      this.hasError.set(false);
+    }
 
     this.http
       .get<unknown>(url)
       .subscribe({
         next: response => {
           this.tickets.set(this.normalizeTicketsResponse(response));
+          this.hasError.set(false);
         },
         error: error => {
           console.error('Failed to load tickets', error);
           this.hasError.set(true);
-          this.loading.set(false);
+          if (!silent) {
+            this.loading.set(false);
+          }
         },
-        complete: () => this.loading.set(false),
+        complete: () => {
+          if (!silent) {
+            this.loading.set(false);
+          }
+        },
       });
   }
 
-  getCountTicketsByRequesterId(requesterId: string, statusType: string): Observable<number> {
-    if (!requesterId || requesterId === '') {
+
+  getCountTicketsByUserId(userId: string, statusType: string): Observable<number> {
+    if (!userId || userId.trim() === '') {
       console.warn('Cannot load finished tickets count without a requester id.');
       return of(0);
     }
 
-    const url = `${environment.apiUrl}/${endpoints.tickets.countByRequester(requesterId)}`;
-
-    let params = new HttpParams();
-    if (statusType && statusType.trim() !== '') {
-      params = params.set('status', statusType);
+    const endpointPath = this.getCountTicketEndpointForTeam(userId);
+    if (!endpointPath) {
+      console.warn('Cannot load finished tickets count without a valid team context.');
+      return of(0);
     }
 
+    const url = `${environment.apiUrl}/${endpointPath}`;
+    const status = statusType ? statusType.trim() : '';
+    let params = new HttpParams();
+    if (status) {
+      params = params.set('status', status);
+    }
 
     return this.http.get<ApiCollectionResponse<CountFinishedTickets>>(url, { params }).pipe(
       map(response => {
@@ -169,6 +211,36 @@ export class TicketService {
       }),
     );
   }
+
+  private getTicketsEndpointForTeam(userId: string): string | null {
+    const role = this.authentication.getCurrentUserTeam();
+
+    console.log(role);
+
+
+    if (role === 'Asesoría') {
+      return endpoints.tickets.byRequester(userId);
+    }
+    if (role === 'Soporte') {
+      return endpoints.tickets.byAssignee(userId);
+    }
+    return null;
+  }
+
+  private getCountTicketEndpointForTeam(userId: string): string | null {
+    const role = this.authentication.getCurrentUserTeam();
+
+    if (role === 'Asesoría') {
+      return endpoints.tickets.countByRequester(userId);
+    }
+    if (role === 'Soporte') {
+      return endpoints.tickets.countByAssignee(userId);
+    }
+    return null;
+  }
+
+
+
 
 
   createTicket(payload: TicketCreateRequest | FormData): Observable<Ticket> {
@@ -278,7 +350,7 @@ export class TicketService {
   private createFallbackTicket(index: number): Ticket {
     return {
       id: `raw-${index}-${Date.now()}`,
-      code: 'Sin código',
+      code: 'Sin c├│digo',
       note: '',
       requestTypeId: null,
       request: null,
@@ -316,4 +388,26 @@ export class TicketService {
     }
     return null;
   }
+
+  enableRealtimeUpdates(): void {
+    this.refreshSubscribers++;
+    if (this.refreshIntervalId) {
+      return;
+    }
+    this.getAllTickets({ silent: true });
+    this.refreshIntervalId = setInterval(() => {
+      this.getAllTickets({ silent: true });
+    }, this.refreshIntervalMs);
+  }
+
+  disableRealtimeUpdates(): void {
+    if (this.refreshSubscribers > 0) {
+      this.refreshSubscribers--;
+    }
+    if (this.refreshSubscribers === 0 && this.refreshIntervalId) {
+      clearInterval(this.refreshIntervalId);
+      this.refreshIntervalId = null;
+    }
+  }
 }
+

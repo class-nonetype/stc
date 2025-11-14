@@ -74,6 +74,7 @@ async def sign_in(
         credential={
             'userAccountId': str(user_account_id),
             'teamId': str(team_id),
+            'teamName': str(team.description)
         }
     )
 

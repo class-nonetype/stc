@@ -10,6 +10,11 @@ from src.core.database.base import Base
 
 from .user_accounts import UserAccounts
 
+
+
+
+
+# tipo de solicitud del ticket
 class RequestTypes(Base):
     __tablename__ = "request_types"
 
@@ -30,6 +35,7 @@ class RequestTypes(Base):
     )
 
 
+# prioridad del ticket
 class PriorityTypes(Base):
     __tablename__ = "priority_types"
 
@@ -50,6 +56,7 @@ class PriorityTypes(Base):
     )
 
 
+# estado del ticket
 class StatusTypes(Base):
     __tablename__ = "status_types"
 
@@ -71,7 +78,7 @@ class StatusTypes(Base):
 
 
 
-# más preciso
+
 @event.listens_for(RequestTypes.__table__, "after_create")
 def seed_default_request_types(target, connection, **kwargs) -> None:
     data = [
@@ -86,6 +93,7 @@ def seed_default_request_types(target, connection, **kwargs) -> None:
         #{"value": 6, "description": "Soporte"},
     ]
     connection.execute(target.insert(), data)
+
 
 
 @event.listens_for(PriorityTypes.__table__, "after_create")

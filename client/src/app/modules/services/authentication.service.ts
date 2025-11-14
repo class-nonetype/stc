@@ -30,7 +30,6 @@ export class AuthenticationSessionService {
       )
       .pipe(
         tap(response => {
-          console.log(response);
           console.log(this.decodeJwtPayload(response.accessToken ?? ''));
         })
       );
@@ -155,6 +154,19 @@ export class AuthenticationSessionService {
     console.log(payload);
 
     return payload['userAccountId']
+  }
+
+  getCurrentUserTeam(): string | null {
+    const session = this.session();
+    if (session?.team) return session.team;
+
+    const token = this.accessToken();
+    if (!token) return null;
+
+    const payload = this.decodeJwtPayload(token);
+    if (!payload) return null;
+
+    return payload['team']
   }
 
 
