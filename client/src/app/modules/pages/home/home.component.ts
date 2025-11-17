@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIcon, MatIconModule } from '@angular/material/icon';
+import { MatBadgeModule } from '@angular/material/badge';
 
 import { FormService } from '../../services/form.service';
 import { Router } from '@angular/router';
@@ -35,6 +36,7 @@ interface HomeOption {
   trend?: string;
 }
 
+const EMPTY_STATS: HomeOption[] = [];
 
 
 @Component({
@@ -45,7 +47,8 @@ interface HomeOption {
     MatIconModule,
     MatButtonModule,
     MatCardModule,
-    MatGridListModule
+    MatGridListModule,
+    MatBadgeModule
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
@@ -109,6 +112,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   supportUserOptions: HomeOption[] = [...this.supportBaseOptions];
   advisorUserOptions: HomeOption[] = [...this.advisorBaseOptions];
+  statusDashboardOptions: HomeOption[] = EMPTY_STATS;
 
 
 
@@ -204,13 +208,9 @@ export class HomePage implements OnInit, OnDestroy {
       },
     ];
 
-    if (this.isSupportUser()) {
-      this.supportUserOptions = [...this.supportBaseOptions];
-      this.advisorUserOptions = [...this.advisorBaseOptions];
-    } else {
-      this.supportUserOptions = [...this.supportBaseOptions];
-      this.advisorUserOptions = [...this.advisorBaseOptions, ...statsOptions];
-    }
+    this.statusDashboardOptions = statsOptions;
+    this.supportUserOptions = [...this.supportBaseOptions];
+    this.advisorUserOptions = [...this.advisorBaseOptions];
     this.cdr.markForCheck();
   }
 

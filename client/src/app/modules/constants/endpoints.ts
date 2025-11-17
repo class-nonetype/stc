@@ -18,7 +18,12 @@ export const endpoints = {
     getAllTicketsByManagerUser: `${applicationRoute}/select/all/tickets/manager`,
     getTotalTicketsByRequesterUserId: (requesterId: string) => `${applicationRoute}/select/total/tickets/requester/${requesterId}`,
     //countByAssignee: (assigneeId: string) => `${applicationRoute}/select/total/tickets/assignee/${assigneeId}`,
-    getTotalTicketsByManagerUser: `${applicationRoute}/select/total/tickets/manager`
+    getTotalTicketsByManagerUser: `${applicationRoute}/select/total/tickets/manager`,
+
+
+    setTicketStatusByTicketId: (ticketId: string, statusId: string) => `${applicationRoute}/update/ticket/${ticketId}/status/${statusId}`,
+    setTicketManagerByTicketId: (ticketId: string, managerId: string) => `${applicationRoute}/update/ticket/${ticketId}/manager/${managerId}`,
+
   },
 
   userTeam: {

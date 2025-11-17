@@ -17,7 +17,7 @@ interface ApiCollectionResponse<T> {
 export class TicketService {
   private readonly http = inject(HttpClient);
   private readonly authentication = inject(AuthenticationSessionService);
-  private readonly refreshIntervalMs = 10000;
+  private readonly refreshIntervalMs = 2000;
   private refreshIntervalId: ReturnType<typeof setInterval> | null = null;
   private refreshSubscribers = 0;
 
@@ -239,8 +239,23 @@ export class TicketService {
     return null;
   }
 
+  setTicketManagerByTicketId(ticketId: string, managerId: string) {
+    return this.http
+      .put<boolean>(
+        `${environment.apiUrl}/${endpoints.tickets.setTicketManagerByTicketId(ticketId, managerId)}`,
+        {}
+      )
+      .pipe(map(() => true));
+  }
 
-
+  setTicketStatusByTicketId(ticketId: string, statusId: string) {
+    return this.http
+      .put<boolean>(
+        `${environment.apiUrl}/${endpoints.tickets.setTicketStatusByTicketId(ticketId, statusId)}`,
+        {}
+      )
+      .pipe(map(() => true));
+  }
 
 
   postTicket(payload: TicketCreateRequest | FormData): Observable<Ticket> {
@@ -333,9 +348,9 @@ export class TicketService {
       statusTypeId: this.toNullableString(schema.statusTypeId),
       status: this.toNullableString(schema.status),
       requesterId: this.ensureString(schema.requesterId, 'Sin solicitante'),
-      //assigneeId: this.toNullableString(schema.assigneeId),
+      managerId: this.toNullableString(schema.managerId),
       requester: this.toNullableString(schema.requester),
-      //assignee: this.toNullableString(schema.assignee),
+      manager: this.toNullableString(schema.manager),
       teamId: this.toNullableString(schema.teamId),
       duetAt: this.toNullableString(schema.duetAt),
       resolvedAt: this.toNullableString(schema.resolvedAt),
@@ -359,9 +374,9 @@ export class TicketService {
       statusTypeId: null,
       status: null,
       requesterId: 'unknown',
-      //assigneeId: null,
+      managerId: null,
       requester: null,
-      //assignee: null,
+      manager: null,
       teamId: null,
       duetAt: null,
       resolvedAt: null,
@@ -389,12 +404,14 @@ export class TicketService {
     return null;
   }
 
+
   enableRealtimeUpdates(): void {
     this.refreshSubscribers++;
     if (this.refreshIntervalId) {
       return;
     }
     this.getAllTickets({ silent: true });
+
     this.refreshIntervalId = setInterval(() => {
       this.getAllTickets({ silent: true });
     }, this.refreshIntervalMs);
@@ -404,6 +421,7 @@ export class TicketService {
     if (this.refreshSubscribers > 0) {
       this.refreshSubscribers--;
     }
+
     if (this.refreshSubscribers === 0 && this.refreshIntervalId) {
       clearInterval(this.refreshIntervalId);
       this.refreshIntervalId = null;

@@ -17,10 +17,17 @@
           tabindex="0"
           (click)="dashboardOption.click()">
           <div class="dashboard-option-icon" aria-hidden="true">
-            <mat-icon class="dashboard-option-icon-main">{{ dashboardOption.icon }}</mat-icon>
+            <mat-icon class="dashboard-option-icon-main">
+              {{ dashboardOption.icon }}
+            </mat-icon>
             @if (dashboardOption.iconBadge){
               <span class="dashboard-option-icon-badge">
                 <mat-icon>speaker_notes</mat-icon>
+              </span>
+            }
+            @if (dashboardOption.value !== undefined && dashboardOption.value !== null){
+              <span class="dashboard-option-icon-badge dashboard-option-counter">
+                {{ dashboardOption.value }}
               </span>
             }
 
@@ -35,13 +42,9 @@
             @if ((dashboardOption.value !== undefined && dashboardOption.value !== null) ){
 
               @if ( dashboardOption.value == 0 ) {
-                <!-- <strong class="dashboard-card-value">Aún no ha finalizado ningún ticket.</strong> -->
+                <!-- <strong class="dashboard-card-value">AA�n no ha finalizado ningA�n ticket.</strong> -->
                 <p>Aún no hay avance en el ticket.</p>
-              } @else {
-                <strong class="dashboard-card-value">{{ dashboardOption.value }}</strong>
-                <!-- <span class="dashboard-card-trend">{{ dashboardOption.trend }}</span> -->
               }
-
             }
           </div>
         </mat-card>
@@ -54,10 +57,17 @@
           tabindex="0"
           (click)="dashboardOption.click()">
           <div class="dashboard-option-icon" aria-hidden="true">
-            <mat-icon class="dashboard-option-icon-main">{{ dashboardOption.icon }}</mat-icon>
+            <mat-icon class="dashboard-option-icon-main">
+              {{ dashboardOption.icon }}
+            </mat-icon>
             @if (dashboardOption.iconBadge){
               <span class="dashboard-option-icon-badge">
                 <mat-icon>speaker_notes</mat-icon>
+              </span>
+            }
+            @if (dashboardOption.value !== undefined && dashboardOption.value !== null){
+              <span class="dashboard-option-icon-badge dashboard-option-counter">
+                {{ dashboardOption.value }}
               </span>
             }
 
@@ -72,8 +82,8 @@
             @if ((dashboardOption.value !== undefined && dashboardOption.value !== null) ){
 
               @if ( dashboardOption.value == 0 ) {
-                <!-- <strong class="dashboard-card-value">Aún no ha finalizado ningún ticket.</strong> -->
-                <p>Aún no hay avance en el ticket.</p>
+                <!-- <strong class="dashboard-card-value">AA�n no ha finalizado ningA�n ticket.</strong> -->
+                <p>AA�n no hay avance en el ticket.</p>
               } @else {
                 <strong class="dashboard-card-value">{{ dashboardOption.value }}</strong>
                 <!-- <span class="dashboard-card-trend">{{ dashboardOption.trend }}</span> -->
@@ -85,14 +95,102 @@
       }
     }
 
+    <!--
+    @else {
+      @for (dashboardOption of advisorUserOptions; track dashboardOption.label) {
+        <mat-card
+          class="dashboard-option-card"
+          role="button"
+          tabindex="0"
+          (click)="dashboardOption.click()">
+          <div class="dashboard-option-icon" aria-hidden="true">
+            <mat-icon class="dashboard-option-icon-main">
+              {{ dashboardOption.icon }}
+            </mat-icon>
+            @if (dashboardOption.iconBadge){
+              <span class="dashboard-option-icon-badge">
+                <mat-icon>speaker_notes</mat-icon>
+              </span>
+            }
+            @if (dashboardOption.value !== undefined && dashboardOption.value !== null){
+              <span class="dashboard-option-icon-badge dashboard-option-counter">
+                {{ dashboardOption.value }}
+              </span>
+            }
+
+          </div>
+          <div class="dashboard-option-content">
+            <h3>{{ dashboardOption.label }}</h3>
+
+            @if ( dashboardOption.subtitle ){
+              <p>{{ dashboardOption.subtitle }}</p>
+            }
+
+            @if ((dashboardOption.value !== undefined && dashboardOption.value !== null) ){
+
+              @if ( dashboardOption.value == 0 ) {
+                <p>Aún no hay avance en el ticket.</p>
+              }
+
+            }
+          </div>
+        </mat-card>
+      }
+    }
+    -->
+
 
 
   </section>
 
+  @if ( statusDashboardOptions.length ) {
+    <section class="dashboard-cards">
+      @for (dashboardOption of statusDashboardOptions; track dashboardOption.label) {
+        <mat-card
+          class="dashboard-option-card"
+          role="button"
+          tabindex="0"
+          (click)="dashboardOption.click()">
+          <div class="dashboard-option-icon" aria-hidden="true">
+            <mat-icon class="dashboard-option-icon-main">
+              {{ dashboardOption.icon }}
+            </mat-icon>
+            @if (dashboardOption.iconBadge){
+              <span class="dashboard-option-icon-badge">
+                <mat-icon>speaker_notes</mat-icon>
+              </span>
+            }
+            @if (dashboardOption.value !== undefined && dashboardOption.value !== null){
+              <span class="dashboard-option-icon-badge dashboard-option-counter">
+                {{ dashboardOption.value }}
+              </span>
+            }
+
+          </div>
+          <div class="dashboard-option-content">
+            <h3>{{ dashboardOption.label }}</h3>
+
+            @if ( dashboardOption.subtitle ){
+              <p>{{ dashboardOption.subtitle }}</p>
+            }
+
+            @if ((dashboardOption.value !== undefined && dashboardOption.value !== null) ){
+
+              @if ( dashboardOption.value == 0 ) {
+                <p>Aún no hay avance en el ticket.</p>
+              }
+
+            }
+          </div>
+        </mat-card>
+      }
+    </section>
+  }
+
   <!--
   <section class="dashboard-empty">
     <div>
-      <h2>Elige una opción del menú</h2>
+      <h2>Elige una opciA3n del menA�</h2>
       <p>Explora Analytics, Reporting o Projects para comenzar a trabajar.</p>
     </div>
   </section>

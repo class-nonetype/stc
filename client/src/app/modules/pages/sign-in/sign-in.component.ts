@@ -38,7 +38,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export default class SignInPage {
   private readonly router = inject(Router);
-  private readonly authentication = inject(AuthenticationSessionService);
+  private readonly authenticationService = inject(AuthenticationSessionService);
 
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
@@ -63,11 +63,11 @@ export default class SignInPage {
 
     const credentials: SignInRequest = this.form.getRawValue();
 
-    this.authentication.signIn(credentials)
+    this.authenticationService.signIn(credentials)
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (payload: SignInResponse) => {
-          const session = this.authentication.establishSession(payload);
+          const session = this.authenticationService.establishSession(payload);
           if (!session) {
             this.error.set('No se pudo establecer la sesión. Inténtalo nuevamente.');
             return;

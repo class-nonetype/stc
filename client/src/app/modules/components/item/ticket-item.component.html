@@ -3,14 +3,15 @@
     @if ( userTeam === 'Soporte' ){
       <header class="ticket-detail-header">
         <div class="ticket-detail-heading">
-          <span
-            class="ticket-status-dot"
-            [class.ticket-status-dot--on-hold]="statusKey === 'on_hold'"
-            [class.ticket-status-dot--in-progress]="statusKey === 'in_progress'"
-            [class.ticket-status-dot--default]="statusKey !== 'on_hold' && statusKey !== 'in_progress'"
-            aria-hidden="true"
-          ></span>
+
           <div class="ticket-detail-heading-text">
+            <span
+              class="ticket-status-dot"
+              [class.ticket-status-dot--on-hold]="statusKey === 'on_hold'"
+              [class.ticket-status-dot--in-progress]="statusKey === 'in_progress'"
+              [class.ticket-status-dot--default]="statusKey !== 'on_hold' && statusKey !== 'in_progress'"
+              aria-hidden="true"
+            ></span>
             <p class="ticket-detail-eyebrow">SOPORTE | Detalle del ticket</p>
             <h2 class="ticket-detail-title">{{ displayTitle }}</h2>
           </div>
@@ -18,6 +19,7 @@
         <button type="button" class="ticket-detail-close" (click)="onClose()" aria-label="Cerrar dialogo">
           <mat-icon aria-hidden="true">close</mat-icon>
         </button>
+
       </header>
 
       <div class="ticket-detail-chips">
@@ -64,6 +66,40 @@
           <p class="ticket-detail-panel-title">{{ lastUpdated }}</p>
         </div>
       </section>
+
+      @if (!ticket.managerId) {
+      <section class="ticket-detail-panel">
+        <button mat-flat-button color="primary" type="button" (click)="onTakeTicket()">
+          <mat-icon aria-hidden="true">emoji_people</mat-icon>
+          Tomar ticket
+        </button>
+      </section>
+      } @else if (ticket.status !== 'En espera') {
+
+        <section class="ticket-detail-panel">
+          <header class="ticket-detail-panel-heading">
+            <span class="ticket-detail-panel-label">Cambiar estado</span>
+          </header>
+          <div class="ticket-detail-panel-body">
+            <mat-chip-listbox class="ticket-status-chip-set" aria-label="Estados disponibles">
+              @for (statusType of statusTypes; track statusType.id) {
+                <mat-chip-option
+                  [selected]="ticket.statusTypeId === statusType.id"
+                  [ngClass]="statusChipClass(statusType)"
+                  (selectionChange)="onStatusSelected(statusType.id, $event.selected)">
+                  {{ statusType.description ?? 'Sin estado' }}
+                </mat-chip-option>
+              }
+            </mat-chip-listbox>
+          </div>
+        </section>
+
+      }
+
+
+
+
+
     } @else if ( userTeam === 'Asesoría' ){
       <header class="ticket-detail-header">
         <div class="ticket-detail-heading">
@@ -102,11 +138,19 @@
 
       <section class="ticket-detail-panel">
         <header class="ticket-detail-panel-heading">
-          <span class="ticket-detail-panel-label">Solicitante</span>
+          <span class="ticket-detail-panel-label">Encargado</span>
         </header>
-        <div class="ticket-detail-panel-body">
-          <p class="ticket-detail-panel-title">{{ requesterDisplayName }}</p>
-        </div>
+
+        @if ( managerDisplayName ){
+          <div class="ticket-detail-panel-body">
+            <p class="ticket-detail-panel-title">{{ managerDisplayName }}</p>
+          </div>
+        } @else {
+          <div class="ticket-detail-panel-body">
+            <p class="ticket-detail-panel-title">No hay un encargado aún</p>
+          </div>
+        }
+
       </section>
 
       <section class="ticket-detail-panel ticket-detail-panel--description">
@@ -132,5 +176,3 @@
 
   </article>
 }
-
-

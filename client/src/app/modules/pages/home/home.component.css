@@ -125,6 +125,26 @@
   line-height: 1;
 }
 
+.dashboard-option-icon .mat-badge-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-option-counter {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  border: 2px solid #ffffff;
+  color: #1f2937;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 10px 24px -18px rgba(17, 24, 39, 0.28);
+}
+
 .dashboard-option-content {
   display: flex;
   flex-direction: column;

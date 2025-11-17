@@ -1,0 +1,15 @@
+:host {
+  display: contents;
+}
+
+.select-form-field {
+  display: block;
+  width: 100%;
+}
+
+@supports not (display: contents) {
+  :host {
+    display: block;
+    width: 100%;
+  }
+}

@@ -5,6 +5,7 @@ import { finalize, map, tap } from 'rxjs/operators';
 import { Session, SignInRequest, SignInResponse, SignOutRequest } from '../interfaces/authentication.interface';
 import { environment } from '@environments/environment';
 import { endpoints } from '../constants/endpoints';
+import { SignUpRequestPayload, SignUpResponse } from '../interfaces/sign-up.interface';
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationSessionService {
@@ -34,6 +35,25 @@ export class AuthenticationSessionService {
         })
       );
   }
+
+  signUp(payload: SignUpRequestPayload) {
+    return this.http.post<SignUpResponse>(
+      `${environment.apiUrl}/${endpoints.authentication.signUp}`,
+      payload,
+    );
+  }
+
+  signOut(token: string | null) {
+    const payload: SignOutRequest = {
+      authorization: token ?? '',
+    };
+
+    return this.http.post<void>(
+      `${environment.apiUrl}/${endpoints.authentication.signOut}`,
+      payload
+    );
+  }
+
 
   establishSession(payload: SignInResponse | Session | null | undefined): Session | null {
     const session = this.normalizeSession(payload);
@@ -74,16 +94,7 @@ export class AuthenticationSessionService {
     ).pipe(map(payload => this.establishSession(payload)));
   }
 
-  signOut(token: string | null) {
-    const payload: SignOutRequest = {
-      authorization: token ?? '',
-    };
 
-    return this.http.post<void>(
-      `${environment.apiUrl}/${endpoints.authentication.signOut}`,
-      payload
-    );
-  }
 
 
 

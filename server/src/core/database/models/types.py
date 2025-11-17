@@ -110,9 +110,9 @@ def seed_default_priority_types(target, connection, **kwargs) -> None:
 @event.listens_for(StatusTypes.__table__, "after_create")
 def seed_default_status_types(target, connection, **kwargs) -> None:
     data = [
-        {"value": 1, "description": "Abierto"},
-        {"value": 2, "description": "En proceso"},
-        {"value": 3, "description": "En espera"},
+        {"value": 1, "description": "En espera"},
+        {"value": 2, "description": "Abierto"},
+        {"value": 3, "description": "En proceso"},
         {"value": 4, "description": "Resuelto"},
         {"value": 5, "description": "Cerrado"},
         {"value": 6, "description": "Cancelado"},

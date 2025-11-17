@@ -66,6 +66,8 @@ async def sign_in(
         user_account_id=user_account_id,
     )
     
+    print(f'{team=}')
+    
     user_full_name = await select_user_full_name_by_user_account_id(
         session=session,
         user_account_id=user_account_id,

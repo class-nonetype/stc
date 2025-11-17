@@ -26,6 +26,9 @@ from src.core.schemas.ticket_request import TicketRequest
 from src.core.database.queries.insert import insert_ticket
 from src.core.database.queries.helpers import insert_object_model
 from src.core.database.session import database
+
+
+from src.core.database.queries.alter import update_ticket
 from src.core.database.queries.select import (
     select_all_tickets_by_requester_id,
     select_all_tickets_for_manager,
@@ -131,7 +134,43 @@ async def get_all_support_users(request: Request, session: Annotated[AsyncGenera
 
 
 
+@router.put(path='/update/ticket/{ticket_id}/status/{status_id}')
+async def put_ticket_status(request: Request,
+                            session: Annotated[AsyncGenerator, Depends(database)],
+                            ticket_id: UUID,
+                            status_id: UUID):
+    operation = await update_ticket(
+        session=session,
+        context='status',
+        ticket_id=ticket_id,
+        object_id=status_id)
 
+    return response(
+        response_type=1,
+        status_code=HTTP_200_OK,
+    ) if operation else response(
+        response_type=1,
+        status_code=HTTP_422_UNPROCESSABLE_ENTITY
+    )
+
+@router.put(path='/update/ticket/{ticket_id}/manager/{manager_id}')
+async def put_ticket_manager(request: Request,
+                             session: Annotated[AsyncGenerator, Depends(database)],
+                             ticket_id: UUID,
+                             manager_id: UUID):
+    operation = await update_ticket(
+        session=session,
+        context='manager',
+        ticket_id=ticket_id,
+        object_id=manager_id)
+    
+    return response(
+        response_type=1,
+        status_code=HTTP_200_OK,
+    ) if operation else response(
+        response_type=1,
+        status_code=HTTP_422_UNPROCESSABLE_ENTITY
+    )
 
 
 

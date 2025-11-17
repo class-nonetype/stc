@@ -1,0 +1,28 @@
+<mat-form-field appearance="outline" style="display: block; width: 100%;">
+  <mat-label>{{ label }}</mat-label>
+
+  <mat-select [formControl]="control" [disabled]="loading()">
+    @if (loading()) {
+      <mat-option disabled>Cargando grupos...</mat-option>
+    } @else if (hasError()) {
+      <mat-option disabled>No fue posible cargar los grupos.</mat-option>
+    } @else if (!teams().length) {
+      <mat-option disabled>No hay grupos disponibles.</mat-option>
+    } @else {
+      @for (team of teams(); track team.id) {
+        <mat-option [value]="team.id">{{ team.description }}</mat-option>
+      }
+    }
+  </mat-select>
+
+  @if (hasError()) {
+    <mat-hint>No pudimos cargar los grupos. Reintenta mas tarde.</mat-hint>
+  }
+
+  @if (control.invalid && (control.dirty || control.touched)) {
+    <mat-error>Selecciona un grupo.</mat-error>
+  }
+</mat-form-field>
+
+
+

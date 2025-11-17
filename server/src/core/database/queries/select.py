@@ -152,15 +152,20 @@ async def select_all_tickets_by_requester_id(session: AsyncSession, requester_id
             'code': object_model.code,
             'note': object_model.note,
             'requestTypeId': object_model.request_type_id,
-            'request': select_request_type_description_by_id(session=session, request_type_id=object_model.request_type_id),
+            'request': await select_request_type_description_by_id(session=session, request_type_id=object_model.request_type_id),
             'priorityTypeId': object_model.priority_type_id,
-            'priority': select_priority_type_description_by_id(session=session, priority_type_id=object_model.priority_type_id),
+            'priority': await select_priority_type_description_by_id(session=session, priority_type_id=object_model.priority_type_id),
             'statusTypeId': object_model.status_type_id,
-            'status': select_status_type_description_by_id(session=session, status_type_id=object_model.status_type_id),
+            'status': await select_status_type_description_by_id(session=session, status_type_id=object_model.status_type_id),
+            
+            # id del solicitante
             'requesterId': object_model.requester_id,
-            'assigneeId': object_model.assignee_id,
-            'requester': select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.requester_id),
-            'assignee': select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.assignee_id),
+
+            # id de la persona que toma el ticket
+            'managerId': object_model.manager_id if object_model.manager_id is not None else None,
+            'manager': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.manager_id) if object_model.manager_id is not None else None,
+
+            'requester': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.requester_id),
             'teamId': object_model.team_id,
             'duetAt': object_model.due_at,
             'resolvedAt': object_model.resolved_at,
@@ -212,9 +217,14 @@ async def select_all_tickets_by_requester_id(session: AsyncSession, requester_id
             'statusTypeId': object_model.status_type_id,
             'status': await select_status_type_description_by_id(session=session, status_type_id=object_model.status_type_id),
             'requesterId': object_model.requester_id,
-            'assigneeId': object_model.assignee_id,
+            #'assigneeId': object_model.assignee_id,
             'requester': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.requester_id),
-            'assignee': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.assignee_id) if object_model.assignee_id else None,
+            #'assignee': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.assignee_id) if object_model.assignee_id else None,
+            
+            # id de la persona que toma el ticket
+            'managerId': object_model.manager_id if object_model.manager_id is not None else None,
+            'manager': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.manager_id) if object_model.manager_id is not None else None,
+
             'teamId': object_model.team_id,
             'duetAt': object_model.due_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.due_at is not None else None,
             'resolvedAt': object_model.resolved_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.resolved_at is not None else None,
@@ -251,10 +261,13 @@ async def select_all_tickets_by_assignee_id(session: AsyncSession, assignee_id: 
             'priority': await select_priority_type_description_by_id(session=session, priority_type_id=object_model.priority_type_id),
             'statusTypeId': object_model.status_type_id,
             'status': await select_status_type_description_by_id(session=session, status_type_id=object_model.status_type_id),
+
             'requesterId': object_model.requester_id,
-            'assigneeId': object_model.assignee_id,
             'requester': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.requester_id),
-            'assignee': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.assignee_id) if object_model.assignee_id else None,
+            
+            'managerId': object_model.manager_id if object_model.manager_id is not None else None,
+            'manager': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.manager_id) if object_model.manager_id is not None else None,
+
             'teamId': object_model.team_id,
             'duetAt': object_model.due_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.due_at is not None else None,
             'resolvedAt': object_model.resolved_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.resolved_at is not None else None,
@@ -291,9 +304,11 @@ async def select_all_tickets_for_manager(session: AsyncSession):
             'statusTypeId': object_model.status_type_id,
             'status': await select_status_type_description_by_id(session=session, status_type_id=object_model.status_type_id),
             'requesterId': object_model.requester_id,
-            #'assigneeId': object_model.assignee_id,
             'requester': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.requester_id),
-            #'assignee': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.assignee_id) if object_model.assignee_id else None,
+            
+            'managerId': object_model.manager_id if object_model.manager_id is not None else None,
+            'manager': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.manager_id) if object_model.manager_id is not None else None,
+
             'teamId': object_model.team_id,
             'duetAt': object_model.due_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.due_at is not None else None,
             'resolvedAt': object_model.resolved_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.resolved_at is not None else None,
@@ -338,9 +353,10 @@ async def select_all_finished_tickets_by_requester_id(session: AsyncSession, req
             'statusTypeId': object_model.status_type_id,
             'status': await select_status_type_description_by_id(session=session, status_type_id=object_model.status_type_id),
             'requesterId': object_model.requester_id,
-            'assigneeId': object_model.assignee_id,
+            'managerId': object_model.manager_id if object_model.manager_id is not None else None,
+            'manager': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.manager_id) if object_model.manager_id is not None else None,
+
             'requester': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.requester_id),
-            'assignee': await select_user_full_name_by_user_account_id(session=session, user_account_id=object_model.assignee_id) if object_model.assignee_id else None,
             'teamId': object_model.team_id,
             'duetAt': object_model.due_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.due_at is not None else None,
             'resolvedAt': object_model.resolved_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.resolved_at is not None else None,

@@ -76,7 +76,6 @@ class UserAccounts(Base):
         back_populates="user_account_relationship",
         uselist=False,
     )
-
     team_relationship: Mapped["Teams"] = relationship(
         back_populates="user_account_relationship",
         uselist=False,
@@ -108,3 +107,4 @@ class UserAccounts(Base):
 
     def __repr__(self) -> str:
         return f"UserAccount(id={self.id!s}, username={self.username!r})"
+

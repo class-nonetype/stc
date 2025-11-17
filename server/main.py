@@ -5,6 +5,7 @@ if __name__ == '__main__':
 
     run(
         app=get_application(),
-        host='0.0.0.0',
+        #host='0.0.0.0',
+        host='localhost',
         port=8000
     )

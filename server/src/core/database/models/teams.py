@@ -40,8 +40,6 @@ class Teams(Base):
         uselist=False,
     )
 
-    def __repr__(self) -> str:
-        return f"Tickets(id={self.id!s}, code={getattr(self, 'code', None)!r}, status={self.status!r})"
 
 
 

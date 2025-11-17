@@ -1,0 +1,155 @@
+<section class="auth-layout">
+  <div class="auth-card">
+    <header class="auth-header">
+      <h1 class="auth-title">¿Aún no tienes cuenta?</h1>
+      <p class="auth-subtitle">Completa los pasos para acceder a la plataforma.</p>
+    </header>
+
+    <mat-horizontal-stepper linear class="auth-stepper" [attr.aria-busy]="loading()">
+      <mat-step [stepControl]="profileGroup" label="Perfil">
+        <form [formGroup]="profileGroup" class="step-form">
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre completo</mat-label>
+            <input matInput formControlName="fullName" required>
+            <mat-icon matSuffix>badge</mat-icon>
+            @if (profileControls.fullName.hasError('required') && profileControls.fullName.touched) {
+              <mat-error>
+                Ingresa tu nombre completo.
+              </mat-error>
+            }
+            @if (profileControls.fullName.hasError('minlength')) {
+              <mat-error>
+                Debe tener al menos 3 caracteres.
+              </mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Correo electronico</mat-label>
+            <input matInput formControlName="email" required>
+            <mat-icon matSuffix>mail</mat-icon>
+            @if (profileControls.email.hasError('required') && profileControls.email.touched) {
+              <mat-error>
+                Ingresa tu correo electronico.
+              </mat-error>
+            }
+            @if (profileControls.email.hasError('email')) {
+              <mat-error>
+                El formato del correo no es valido.
+              </mat-error>
+            }
+          </mat-form-field>
+
+          <!--
+          <mat-checkbox formControlName="isActive">
+            Activar cuenta al crearla
+          </mat-checkbox>
+          -->
+          <div class="step-actions">
+            <button mat-flat-button color="primary" matStepperNext [disabled]="profileGroup.invalid">
+              Continuar
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <mat-step [stepControl]="accountGroup" label="Credenciales">
+        <form [formGroup]="accountGroup" class="step-form">
+          <mat-form-field appearance="outline">
+            <mat-label>Usuario</mat-label>
+            <input matInput formControlName="username" required>
+            <mat-icon matSuffix>person</mat-icon>
+            @if (accountControls.username.hasError('required') && accountControls.username.touched) {
+              <mat-error>
+                Ingresa un nombre de usuario.
+              </mat-error>
+            }
+            @if (accountControls.username.hasError('minlength')) {
+              <mat-error>
+                Debe tener al menos 3 caracteres.
+              </mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Contraseña</mat-label>
+            <input matInput type="password" formControlName="password" required>
+            <mat-icon matSuffix>key</mat-icon>
+            @if (accountControls.password.hasError('required') && accountControls.password.touched) {
+              <mat-error>
+                Ingresa una contraseña.
+              </mat-error>
+            }
+            @if (accountControls.password.hasError('minlength')) {
+              <mat-error>
+                Debe tener al menos 8 caracteres.
+              </mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Confirmar contraseña</mat-label>
+            <input matInput type="password" formControlName="confirmPassword" required>
+            <mat-icon matSuffix>key</mat-icon>
+            @if (accountControls.confirmPassword.hasError('required') && accountControls.confirmPassword.touched) {
+              <mat-error>
+                Confirma tu contraseña.
+              </mat-error>
+            }
+            @if (accountGroup.hasError('passwordMismatch') && accountControls.confirmPassword.touched) {
+              <mat-error>
+                Las contraseñas no coinciden.
+              </mat-error>
+            }
+          </mat-form-field>
+
+          <div class="step-actions">
+            <button mat-button type="button" matStepperPrevious>Volver</button>
+            <button mat-flat-button color="primary" matStepperNext [disabled]="accountGroup.invalid">
+              Continuar
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <mat-step [stepControl]="teamGroup" label="Grupo de trabajo">
+        <form [formGroup]="teamGroup" class="step-form" (ngSubmit)="submit()">
+          <select-list
+            [control]="teamGroupControls.teamGroupId"
+            label="Grupo de equipo"
+          ></select-list>
+
+          <div class="auth-feedback">
+            @if (error()) {
+              <div class="auth-error">
+                <mat-icon aria-hidden="true">error_outline</mat-icon>
+                <span>{{ error() }}</span>
+              </div>
+            }
+            @if (success()) {
+              <div class="auth-success">
+                <mat-icon aria-hidden="true">check_circle</mat-icon>
+                <span>{{ success() }}</span>
+              </div>
+            }
+          </div>
+
+          <div class="step-actions">
+            <button mat-button type="button" matStepperPrevious [disabled]="loading()">Volver</button>
+            <button
+              mat-flat-button
+              color="primary"
+              type="submit"
+              [disabled]="loading() || teamGroup.invalid"
+            >
+              @if (loading()) {
+                <mat-icon class="auth-spinner" aria-hidden="true">autorenew</mat-icon>
+              }
+              {{ loading() ? 'Creando...' : 'Crear cuenta' }}
+            </button>
+          </div>
+        </form>
+      </mat-step>
+    </mat-horizontal-stepper>
+  </div>
+</section>

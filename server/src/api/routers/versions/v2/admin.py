@@ -5,6 +5,8 @@ from fastapi import (
 )
 from fastapi.encoders import jsonable_encoder
 
+from src.core.database.queries.select import select_all_teams
+from src.core.schemas.sign_up_request import *
 from src.api.responses import response
 from src.utils.controls import MEDIA_TYPE
 from src.core.database.session import database
@@ -18,21 +20,132 @@ from typing import Annotated
 router = APIRouter()
 
 
+from src.core.database.queries.insert import insert_user_account
 
-'''@router.get(path='/user-roles')
-async def get_all_user_roles(session: AsyncSession = Depends(database)):
-    response_type = 2
-    content = await select_all_user_roles(session=session)
-    json_content = jsonable_encoder(
-      obj={'status': 'success', 'data' : content} if content else {'status': 'error', 'data' : None}
+
+@router.post(path='/create/users')
+async def create_users(session: AsyncSession = Depends(database)):
+    for team in await select_all_teams(session=session):
+        if team.description == 'Soporte':
+            support_group_id = team.id
+
+        elif team.description == 'Asesoría':
+            audit_group_id = team.id
+
+    # asesoria
+    __ = await insert_user_account(
+        session=session,
+        schema=SignUpRequest(
+            UserProfile=UserProfile(
+                full_name='mariel andrea pineda soto',
+                email='mpineda@consejodeauditoria.gob.cl',
+                is_active=True),
+            UserAccount=UserAccount(
+                username='mpineda',
+                password='12345678'),
+            TeamGroup=TeamGroup(id=audit_group_id)
+        )
     )
 
-    status_code = HTTP_200_OK if content else HTTP_404_NOT_FOUND
-
-    return response(
-        response_type=response_type,
-        status_code=status_code,
-        media_type=MEDIA_TYPE,
-        content=json_content
+    __ = await insert_user_account(
+        session=session,
+        schema=SignUpRequest(
+            UserProfile=UserProfile(
+                full_name='liliana leonor vivanco riquelme',
+                email='lleonor@consejodeauditoria.gob.cl',
+                is_active=True),
+            UserAccount=UserAccount(
+                username='lleonor',
+                password='12345678'),
+            TeamGroup=TeamGroup(id=audit_group_id)
+        )
     )
-'''
+
+    __ = await insert_user_account(
+        session=session,
+        schema=SignUpRequest(
+            UserProfile=UserProfile(
+                full_name='coco riquelme',
+                email='criquelme@consejodeauditoria.gob.cl',
+                is_active=True),
+            UserAccount=UserAccount(
+                username='criquelme',
+                password='12345678'),
+            TeamGroup=TeamGroup(id=audit_group_id)
+        )
+    )
+
+
+    __ = await insert_user_account(
+        session=session,
+        schema=SignUpRequest(
+            UserProfile=UserProfile(
+                full_name='javiera ignacia riquelme gutierrez',
+                email='jriquelme@consejodeauditoria.gob.cl',
+                is_active=True),
+            UserAccount=UserAccount(
+                username='jriquelme',
+                password='12345678'),
+            TeamGroup=TeamGroup(id=audit_group_id)
+        )
+    )
+
+
+
+    # soporte
+    __ = await insert_user_account(
+        session=session,
+        schema=SignUpRequest(
+            UserProfile=UserProfile(
+                full_name='daniel robinson santelices candia',
+                email='drobinson@consejodeauditoria.gob.cl',
+                is_active=True),
+            UserAccount=UserAccount(
+                username='drobinson',
+                password='12345678'),
+            TeamGroup=TeamGroup(id=support_group_id)
+        )
+    )
+
+    __ = await insert_user_account(
+        session=session,
+        schema=SignUpRequest(
+            UserProfile=UserProfile(
+                full_name='luis osorio rubilar',
+                email='losorio@consejodeauditoria.gob.cl',
+                is_active=True),
+            UserAccount=UserAccount(
+                username='losorio',
+                password='12345678'),
+            TeamGroup=TeamGroup(id=support_group_id)
+        )
+    )
+
+    __ = await insert_user_account(
+        session=session,
+        schema=SignUpRequest(
+            UserProfile=UserProfile(
+                full_name='blues antonio riquelme',
+                email='briquelme@consejodeauditoria.gob.cl',
+                is_active=True),
+            UserAccount=UserAccount(
+                username='briquelme',
+                password='12345678'),
+            TeamGroup=TeamGroup(id=support_group_id)
+        )
+    )
+
+    __ = await insert_user_account(
+        session=session,
+        schema=SignUpRequest(
+            UserProfile=UserProfile(
+                full_name='gonzalo mauricio vivanco zepeda',
+                email='gvivanco@consejodeauditoria.gob.cl',
+                is_active=True),
+            UserAccount=UserAccount(
+                username='gvivanco',
+                password='12345678'),
+            TeamGroup=TeamGroup(id=support_group_id)
+        )
+    )
+

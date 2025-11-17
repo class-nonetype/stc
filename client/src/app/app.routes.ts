@@ -5,9 +5,14 @@ import { authenticationGuard } from './modules/guards/authentication.guard';
 export const routes: Routes = [
   {
     path: 'sign-in',
-    loadComponent: () =>
-      import('./modules/pages/sign-in/sign-in.component').then(m => m.default),
+    loadComponent: () => import('./modules/pages/sign-in/sign-in.component').then(m => m.default),
   },
+
+  {
+    path: 'sign-up',
+    loadComponent: () => import('./modules/pages/sign-up/sign-up.component').then(m => m.default),
+  },
+
   {
     path: '',
     canActivate: [authenticationGuard],
