@@ -34,6 +34,7 @@ interface HomeOption {
   iconBadge?: string;
   value?: number;
   trend?: string;
+  disabled?: boolean;
 }
 
 const EMPTY_STATS: HomeOption[] = [];
@@ -163,48 +164,57 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   private updateOptions() {
+    const navToTickets = (status: string) =>
+      this.router.navigate(['/tickets'], { queryParams: { status } });
+
     const statsOptions: HomeOption[] = [
       {
         icon: 'schedule',
         label: 'Tickets en espera',
         subtitle: '',
         value: this.ticketCount.onHold,
-        click: () => console.log('Tickets en espera clicked')
+        disabled: this.ticketCount.onHold === 0,
+        click: () => navToTickets('En espera')
       },
       {
         icon: 'pending',
         label: 'Tickets en proceso',
         subtitle: '',
         value: this.ticketCount.inProgress,
-        click: () => console.log('Tickets en proceso clicked')
+        disabled: this.ticketCount.inProgress === 0,
+        click: () => navToTickets('En proceso')
       },
       {
         icon: 'visibility',
         label: 'Tickets abiertos',
         subtitle: '',
         value: this.ticketCount.opened,
-        click: () => console.log('Tickets abiertos clicked')
+        disabled: this.ticketCount.opened === 0,
+        click: () => navToTickets('Abierto')
       },
       {
         icon: 'cancel',
         label: 'Tickets cerrados',
         subtitle: '',
         value: this.ticketCount.closed,
-        click: () => console.log('Tickets cerrados clicked')
+        disabled: this.ticketCount.closed === 0,
+        click: () => navToTickets('Cerrado')
       },
       {
         icon: 'error',
         label: 'Tickets cancelados',
         subtitle: '',
         value: this.ticketCount.cancelled,
-        click: () => console.log('Tickets cancelados clicked')
+        disabled: this.ticketCount.cancelled === 0,
+        click: () => navToTickets('Cancelado')
       },
       {
         icon: 'task_alt',
         label: 'Tickets finalizados',
         subtitle: '',
         value: this.ticketCount.finished,
-        click: () => console.log('Tickets finalizados clicked')
+        disabled: this.ticketCount.finished === 0,
+        click: () => navToTickets('Resuelto')
       },
     ];
 

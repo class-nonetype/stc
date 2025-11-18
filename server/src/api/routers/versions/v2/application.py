@@ -144,13 +144,16 @@ async def put_ticket_status(request: Request,
         context='status',
         ticket_id=ticket_id,
         object_id=status_id)
+    
+    if operation is None:
+        return response(response_type=1, status_code=HTTP_404_NOT_FOUND)
+    
+    if operation is False:
+        return response(response_type=1, status_code=HTTP_422_UNPROCESSABLE_ENTITY)
 
     return response(
         response_type=1,
         status_code=HTTP_200_OK,
-    ) if operation else response(
-        response_type=1,
-        status_code=HTTP_422_UNPROCESSABLE_ENTITY
     )
 
 @router.put(path='/update/ticket/{ticket_id}/manager/{manager_id}')
@@ -164,12 +167,15 @@ async def put_ticket_manager(request: Request,
         ticket_id=ticket_id,
         object_id=manager_id)
     
+    if operation is None:
+        return response(response_type=1, status_code=HTTP_404_NOT_FOUND)
+    
+    if operation is False:
+        return response(response_type=1, status_code=HTTP_422_UNPROCESSABLE_ENTITY)
+
     return response(
         response_type=1,
         status_code=HTTP_200_OK,
-    ) if operation else response(
-        response_type=1,
-        status_code=HTTP_422_UNPROCESSABLE_ENTITY
     )
 
 

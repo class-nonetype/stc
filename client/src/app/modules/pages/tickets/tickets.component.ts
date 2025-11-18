@@ -1,6 +1,7 @@
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { type Ticket } from '../../interfaces/ticket.interface';
 import { TicketService } from '../../services/ticket.service';
@@ -22,9 +23,18 @@ export class TicketInboxPageComponent implements OnInit, OnDestroy {
 
   private readonly ticketService = inject(TicketService);
   private readonly dialog = inject(MatDialog);
+  private readonly route = inject(ActivatedRoute);
   private readonly relativeTimeFormatter = new Intl.RelativeTimeFormat('es', { numeric: 'auto' });
 
   readonly openedTicketIds = signal<Set<string>>(new Set());
+  readonly initialFilters = signal<Partial<{
+    text: string;
+    status: string[];
+    request: string[];
+    priority: string[];
+    requester: string;
+    unreadOnly: boolean;
+  }> | null>(null);
 
   readonly loading = computed(() => this.ticketService.loading());
   readonly hasError = computed(() => this.ticketService.hasError());
@@ -35,6 +45,7 @@ export class TicketInboxPageComponent implements OnInit, OnDestroy {
   constructor(public session: AuthenticationSessionService) {}
 
   ngOnInit(): void {
+    this.syncFiltersFromQuery();
     this.ticketService.enableRealtimeUpdates();
     this.ticketService.getAllTickets();
   }
@@ -62,6 +73,34 @@ export class TicketInboxPageComponent implements OnInit, OnDestroy {
 
   onRetry(): void {
     this.ticketService.getAllTickets();
+  }
+
+  private syncFiltersFromQuery(): void {
+    this.route.queryParamMap.subscribe(params => {
+      const status = this.readArrayParam(params, 'status');
+      const text = params.get('text') ?? undefined;
+      const requester = params.get('requester') ?? undefined;
+
+      if (!status.length && !text && !requester) {
+        this.initialFilters.set(null);
+        return;
+      }
+
+      this.initialFilters.set({
+        status,
+        text,
+        requester,
+      });
+    });
+  }
+
+  private readArrayParam(params: ParamMap, key: string): string[] {
+    const values = params.getAll(key);
+    if (values.length > 0) return values.filter(Boolean);
+
+    const single = params.get(key);
+    if (!single) return [];
+    return single.split(',').map(v => v.trim()).filter(Boolean);
   }
 
 }

@@ -33,10 +33,14 @@ export interface CountFinishedTickets {
 
 export interface TicketAttachment {
   id: string;
-  file_name: string;
-  mime_type?: string | null;
-  file_size?: number | null;
-  url?: string;
+  ticketId?: string | null;
+  fileName: string;
+  fileStorageName?: string | null;
+  filePath?: string | null;
+  fileSize?: number | null;
+  mimeType?: string | null;
+  createdAt?: string | null;
+  url?: string | null;
 }
 
 export interface LegacyTicketUser {
@@ -128,6 +132,8 @@ export interface Ticket {
   createdAt: string | null;
   updatedAt: string | null;
   isResolved: boolean | null;
+
+  attachments?: TicketAttachment[];
 }
 
 export interface TicketCard {
@@ -185,6 +191,8 @@ export type TicketResponse = {
   createdAt?: string | null;
   updatedAt?: string | null;
   isResolved?: boolean | null;
+  attachments?: TicketAttachment[] | unknown;
+
 };
 
 export interface TicketUpdateRequest extends Partial<TicketCreateRequest> {

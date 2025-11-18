@@ -2,7 +2,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '@environments/environment';
 import { endpoints } from '../constants/endpoints';
-import type { LevelType, SupportUser, CountFinishedTickets, Ticket, TicketResponse, TicketCreateRequest } from '../interfaces/ticket.interface';
+import type { LevelType, SupportUser, CountFinishedTickets, Ticket, TicketResponse, TicketCreateRequest, TicketAttachment } from '../interfaces/ticket.interface';
 import { forkJoin, of } from 'rxjs';
 import { Observable, catchError, map, tap, throwError } from 'rxjs';
 
@@ -234,7 +234,7 @@ export class TicketService {
       return endpoints.tickets.getTotalTicketsByRequesterUserId(userId);
     }
     if (role === 'Soporte') {
-      return endpoints.tickets.getTotalTicketsByManagerUser;
+      return endpoints.tickets.getTotalTicketsByManagerUserId(userId);
     }
     return null;
   }
@@ -359,13 +359,14 @@ export class TicketService {
       createdAt: this.toNullableString(schema.createdAt),
       updatedAt: this.toNullableString(schema.updatedAt),
       isResolved: typeof schema.isResolved === 'boolean' ? schema.isResolved : null,
+      attachments: this.normalizeAttachments(schema.attachments, id),
     };
   }
 
   private createFallbackTicket(index: number): Ticket {
     return {
       id: `raw-${index}-${Date.now()}`,
-      code: 'Sin c├│digo',
+      code: 'Sin código',
       note: '',
       requestTypeId: null,
       request: null,
@@ -385,6 +386,7 @@ export class TicketService {
       createdAt: null,
       updatedAt: null,
       isResolved: null,
+      attachments: [],
     };
   }
 
@@ -402,6 +404,48 @@ export class TicketService {
       return String(value);
     }
     return null;
+  }
+
+  private toNullableNumber(value: unknown): number | null {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+    if (typeof value === 'string') {
+      const parsed = Number(value);
+      if (!Number.isNaN(parsed)) {
+        return parsed;
+      }
+    }
+    return null;
+  }
+
+  private normalizeAttachments(source: unknown, ticketId: string): TicketAttachment[] {
+    const entries = this.extractArray(source);
+    if (!entries) return [];
+
+    return entries
+      .map((entry, idx) => this.mapAttachment(entry, idx, ticketId))
+      .filter((att): att is TicketAttachment => Boolean(att));
+  }
+
+  private mapAttachment(entry: unknown, index: number, ticketId: string): TicketAttachment | null {
+    if (!entry || typeof entry !== 'object') return null;
+    const raw = entry as Record<string, unknown>;
+
+    console.log('raw', raw);
+
+
+    return {
+      id: this.ensureString(raw['id'], `att-${index}-${Date.now()}`),
+      ticketId: this.toNullableString(raw['ticketId']) ?? ticketId,
+      fileName: this.ensureString(raw['fileName'], 'Archivo adjunto'),
+      fileStorageName: this.toNullableString(raw['fileStorageName']),
+      filePath: this.toNullableString(raw['filePath']),
+      fileSize: this.toNullableNumber(raw['fileSize']),
+      mimeType: this.toNullableString(raw['mimeType']),
+      createdAt: this.toNullableString(raw['createdAt']),
+      url: this.toNullableString(raw['url']),
+    };
   }
 
 

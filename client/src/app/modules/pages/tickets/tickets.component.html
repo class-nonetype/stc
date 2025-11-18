@@ -1,31 +1,17 @@
 @if (userIsAuthenticated()) {
   <section class="page" aria-live="polite">
-    <header class="page__header">
-      <div class="page__header-body">
-        <h1 class="page__title">Inbox de tickets</h1>
-        <p class="page__subtitle">Revisa y gestiona las solicitudes mas recientes del equipo.</p>
+    <header class="page-header">
+      <div class="page-header-body">
+        <h1 class="page-title">Inbox de tickets</h1>
+        <p class="page-subtitle">Revisa y gestiona las solicitudes mas recientes del equipo.</p>
       </div>
-
-      <!--
-      @if (session.team() == 'Asesoría') {
-        <button
-          type="button"
-          class="page__create"
-          matButton="elevated"
-          mat-stroked-button
-          color="primary"
-          (click)="onpostTicket()">
-          <mat-icon aria-hidden="true">add</mat-icon>
-          Nuevo reporte
-        </button>
-      }
-      -->
     </header>
 
     <ticket-list
       [tickets]="cards()"
       [loading]="loading()"
       [hasError]="hasError()"
+      [initialFilters]="initialFilters()"
       (open)="onOpen($event)"
       (retry)="onRetry()"
     ></ticket-list>

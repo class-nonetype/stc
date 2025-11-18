@@ -25,11 +25,11 @@ export class SidenavOptions {
 
   private readonly router = inject(Router);
 
-  private readonly authentication = inject(AuthenticationSessionService)
+  private readonly authenticationService = inject(AuthenticationSessionService);
 
   readonly modules: SidenavOption[] = [
     {
-      name: 'Inicio',
+      name: 'Panel',
       route: '/dashboard',
       icon: 'dashboard',
       onClick: () => {
@@ -49,14 +49,14 @@ export class SidenavOptions {
       name: 'Cerrar sesión',
       icon: 'logout',
       onClick: () => {
-        const token = this.authentication.accessToken();
-        this.authentication.signOut(token).subscribe({
+        const token = this.authenticationService.accessToken();
+        this.authenticationService.signOut(token).subscribe({
           next: () => {
-            this.authentication.clearSession();
+            this.authenticationService.clearSession();
             this.router.navigate(['/sign-in']);
           },
           error: () => {
-            this.authentication.clearSession();
+            this.authenticationService.clearSession();
             this.router.navigate(['/sign-in']);
           },
         });
@@ -64,6 +64,8 @@ export class SidenavOptions {
     },
   ];
 
+
+  // click opción
   handleClick(m: SidenavOption, event: MouseEvent) {
     if (m.onClick) {
       m.onClick(event);
@@ -73,5 +75,21 @@ export class SidenavOptions {
       this.router.navigateByUrl(m.route);
     }
   }
+
+
+  constructor() {
+    if (this.authenticationService.getCurrentUserTeam() === 'Soporte') {
+      const logoutIndex = this.modules.findIndex(m => m.icon === 'logout');
+
+      const entry = { name: 'Administración', icon: 'hardware', onClick: () => {} };
+
+      if (logoutIndex >= 0) {
+        this.modules.splice(logoutIndex, 0, entry);
+      } else {
+        this.modules.push(entry);
+      }
+    }
+  }
+
 
 }

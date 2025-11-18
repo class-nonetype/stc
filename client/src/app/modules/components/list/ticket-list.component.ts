@@ -7,6 +7,7 @@ import {
   input,
   output,
   signal,
+  inject
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -14,6 +15,7 @@ import type { Ticket } from '../../interfaces/ticket.interface';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { AuthenticationSessionService } from '../../services/authentication.service';
 
 
 
@@ -49,9 +51,12 @@ interface TicketFilters {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TicketListComponent {
+  private readonly userSession = inject(AuthenticationSessionService);
+
   readonly tickets = input<Ticket[]>([]);
   readonly loading = input<boolean>(false);
   readonly hasError = input<boolean>(false);
+  readonly initialFilters = input<Partial<TicketFilters> | null>(null);
 
   readonly open = output<Ticket>();
   readonly retry = output<void>();
@@ -70,6 +75,23 @@ export class TicketListComponent {
     unreadOnly: false,
     //dateFrom: null,
     //dateTo: null,
+  });
+
+  private readonly applyInitialFilters = effect(() => {
+    const init = this.initialFilters();
+    if (!init) return;
+
+    this.filters.update(current => ({
+      ...current,
+      ...init,
+      status: init.status ?? current.status,
+      request: init.request ?? current.request,
+      priority: init.priority ?? current.priority,
+      requester: init.requester ?? current.requester,
+      text: init.text ?? current.text,
+      unreadOnly: init.unreadOnly ?? current.unreadOnly,
+    }));
+    this.pageIndex.set(0);
   });
 
 
@@ -219,6 +241,19 @@ export class TicketListComponent {
 
   requesterLabel(ticket: Ticket): string {
     return ticket.requester?.trim() || ticket.requesterId || 'Sin solicitante';
+  }
+
+  getManagerFullName(ticket: Ticket): string {
+    return ticket.manager?.trim() || 'Sin solicitante';
+  }
+
+
+  getCurrentUserTeam() {
+    return this.userSession.getCurrentUserTeam();
+  }
+
+  getCurrentUserId() {
+    return this.userSession.getCurrentUserId();
   }
 
   titleLabel(ticket: Ticket): string {

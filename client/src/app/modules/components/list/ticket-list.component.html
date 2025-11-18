@@ -47,7 +47,11 @@
       <input matInput #rq (input)="patchFilters('requester', rq.value)" />
     </mat-form-field>
 
-    <button type="button" class="inbox-filter-reset" (click)="resetFilters()">Limpiar</button>
+    <!--
+    <button type="button" class="inbox-filter-reset" (click)="resetFilters()" aria-label="Limpiar filtros">
+      <mat-icon aria-hidden="true">backspace</mat-icon>
+    </button>
+    -->
   </div>
 
 
@@ -80,39 +84,103 @@
   } @else {
     <div class="inbox-list" role="list">
       @for (ticket of visibleTickets(); track ticket.id) {
-        <article
-          class="inbox-card"
-          role="listitem"
-          [class.inbox-card--unread]="isUnread(ticket)"
-          (click)="onOpen(ticket)"
-        >
-          <div class="inbox-card-icon" aria-hidden="true">
-            <mat-icon>{{ isUnread(ticket) ? 'mark_email_unread' : 'drafts' }}</mat-icon>
-          </div>
 
-          <div class="inbox-card-content">
-            <div class="inbox-card-header">
-              <div class="inbox-card-pills">
-                <span class="inbox-card-code">{{ ticket.code }}</span>
-                <span
-                  class="inbox-card-status"
-                  [class.inbox-card-status--open]="statusKey(ticket) === 'open'"
-                  [class.inbox-card-status--in-progress]="statusKey(ticket) === 'in_progress'"
-                  [class.inbox-card-status--on-hold]="statusKey(ticket) === 'on_hold'"
-                  [class.inbox-card-status--resolved]="statusKey(ticket) === 'resolved'"
-                  [class.inbox-card-status--closed]="statusKey(ticket) === 'closed'"
-                  [class.inbox-card-status--cancelled]="statusKey(ticket) === 'cancelled'"
-                >
-                  {{ statusLabel(ticket) }}
-                </span>
+
+
+        @if ( getCurrentUserTeam() == 'Soporte') {
+
+          <!-- sólo muestra si el usuario actual es el encargado
+               o si no existe algún encargado en el ticket -->
+          @if ( getCurrentUserId() == ticket.managerId || !ticket.managerId ){
+            <article
+              class="inbox-card"
+              role="listitem"
+              [class.inbox-card--unread]="isUnread(ticket)"
+              (click)="onOpen(ticket)"
+            >
+              <div class="inbox-card-icon" aria-hidden="true">
+                <mat-icon>{{ isUnread(ticket) ? 'mark_email_unread' : 'drafts' }}</mat-icon>
               </div>
-              <h2 class="inbox-card-title">{{ titleLabel(ticket) }}</h2>
-            </div>
-            <p class="inbox-card-from">Solicitante · {{ requesterLabel(ticket) }}</p>
-          </div>
 
-          <time class="inbox-card-time">{{ updatedAgo(ticket) }}</time>
-        </article>
+              <div class="inbox-card-content">
+                <div class="inbox-card-header">
+                  <div class="inbox-card-pills">
+                    <span class="inbox-card-code">{{ ticket.code }}</span>
+                    <span
+                      class="inbox-card-status"
+                      [class.inbox-card-status--open]="statusKey(ticket) === 'open'"
+                      [class.inbox-card-status--in-progress]="statusKey(ticket) === 'in_progress'"
+                      [class.inbox-card-status--on-hold]="statusKey(ticket) === 'on_hold'"
+                      [class.inbox-card-status--resolved]="statusKey(ticket) === 'resolved'"
+                      [class.inbox-card-status--closed]="statusKey(ticket) === 'closed'"
+                      [class.inbox-card-status--cancelled]="statusKey(ticket) === 'cancelled'"
+                    >
+                      {{ statusLabel(ticket) }}
+                    </span>
+                  </div>
+                  <h2 class="inbox-card-title">{{ titleLabel(ticket) }}</h2>
+                </div>
+
+                @if ( getCurrentUserTeam() === 'Asesoría') {
+                  @if ( getManagerFullName(ticket) !== 'Sin solicitante' ) { <p class="inbox-card-from">Encargado · {{ getManagerFullName(ticket) }}</p> }
+                  @else { <p class="inbox-card-from">Sin encargado por el momento</p> }
+
+                } @else if ( getCurrentUserTeam() === 'Soporte') {
+                  <p class="inbox-card-from">Solicitante · {{ requesterLabel(ticket) }}</p>
+
+                }
+
+              </div>
+
+              <time class="inbox-card-time">{{ updatedAgo(ticket) }}</time>
+            </article>
+          }
+        }
+        @else if ( getCurrentUserTeam() == 'Asesoría' ){
+          <article
+            class="inbox-card"
+            role="listitem"
+            [class.inbox-card--unread]="isUnread(ticket)"
+            (click)="onOpen(ticket)"
+          >
+            <div class="inbox-card-icon" aria-hidden="true">
+              <mat-icon>{{ isUnread(ticket) ? 'mark_email_unread' : 'drafts' }}</mat-icon>
+            </div>
+
+            <div class="inbox-card-content">
+              <div class="inbox-card-header">
+                <div class="inbox-card-pills">
+                  <span class="inbox-card-code">{{ ticket.code }}</span>
+                  <span
+                    class="inbox-card-status"
+                    [class.inbox-card-status--open]="statusKey(ticket) === 'open'"
+                    [class.inbox-card-status--in-progress]="statusKey(ticket) === 'in_progress'"
+                    [class.inbox-card-status--on-hold]="statusKey(ticket) === 'on_hold'"
+                    [class.inbox-card-status--resolved]="statusKey(ticket) === 'resolved'"
+                    [class.inbox-card-status--closed]="statusKey(ticket) === 'closed'"
+                    [class.inbox-card-status--cancelled]="statusKey(ticket) === 'cancelled'"
+                  >
+                    {{ statusLabel(ticket) }}
+                  </span>
+                </div>
+                <h2 class="inbox-card-title">{{ titleLabel(ticket) }}</h2>
+              </div>
+
+              @if ( getManagerFullName(ticket) !== 'Sin solicitante' ) {
+                <p class="inbox-card-from">Encargado · {{ getManagerFullName(ticket) }}</p>
+              }
+              @else {
+                <p class="inbox-card-from">Sin encargado por el momento</p>
+              }
+
+            </div>
+
+            <time class="inbox-card-time">{{ updatedAgo(ticket) }}</time>
+          </article>
+        }
+
+
+
       }
     </div>
     <mat-paginator

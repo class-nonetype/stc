@@ -26,7 +26,10 @@
 }
 
 .authentication-panel--visual {
-  background: linear-gradient(140deg, #f0f2f5 0%, #e0e5ec 60%, #cfd6e4 100%);
+  background: url('/1.png');
+  background-repeat: no-repeat;
+  background-size: 65% auto;
+  background-position: center;
   align-items: flex-end;
   justify-content: flex-start;
   padding: clamp(2rem, 4vw, 3.5rem);
@@ -80,6 +83,16 @@ form {
   color: #312e81;
   font-size: 36px;
   box-shadow: 0 12px 24px -16px rgba(15, 23, 42, 0.35);
+}
+
+.authentication-logo {
+  -webkit-user-drag: none;
+  user-select: none;
+  justify-self: center;
+  width: 160px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 10px 20px rgba(15, 23, 42, 0.18));
 }
 
 .authentication-spinner {

@@ -26,7 +26,7 @@ async def update_last_login_date(session: AsyncSession, user_account_id: UUID) -
 
 
 
-async def update_ticket(session: AsyncSession, context: str, ticket_id: UUID, object_id: UUID):
+async def update_ticket(session: AsyncSession, context: str, ticket_id: UUID, object_id: UUID) -> (bool | None):
     try:
         match context:
             case 'status':
@@ -35,6 +35,7 @@ async def update_ticket(session: AsyncSession, context: str, ticket_id: UUID, ob
                     .where(Tickets.id == ticket_id, Tickets.is_active.is_(True))
                     .values(status_type_id=object_id, updated_at=get_datetime())
                 )
+
                 await session.execute(statement)
                 await session.commit()
 
@@ -49,8 +50,16 @@ async def update_ticket(session: AsyncSession, context: str, ticket_id: UUID, ob
                     .select_from(StatusTypes)
                     .where(StatusTypes.value == 2)
                 )
+                
                 result = await session.execute(status)
-                status_id = result.scalars().first().id
+                
+                object_model = result.scalars().first()
+                
+                if not object_model:
+                    return None
+
+                status_id = object_model.id
+                
                 
                 logger.info(status_id)
                 print(status_id)
@@ -63,8 +72,10 @@ async def update_ticket(session: AsyncSession, context: str, ticket_id: UUID, ob
                         status_type_id=status_id,
                         updated_at=get_datetime())
                 )
+
                 await session.execute(statement)
                 await session.commit()
+
                 return True
 
     except Exception as exception:

@@ -174,6 +174,8 @@ async def select_all_tickets_by_requester_id(session: AsyncSession, requester_id
             'createdAt': object_model.created_at,
             'updatedAt': object_model.updated_at,
             'isResolved': object_model.is_resolved,
+            'attachments': await select_all_tickets_attachments_by_ticket_id(session=session, ticket_id=object_model.id)
+
         } for object_model in result.all()
     ]
 
@@ -233,7 +235,8 @@ async def select_all_tickets_by_requester_id(session: AsyncSession, requester_id
             'createdAt': object_model.created_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.created_at is not None else None,
             'updatedAt': object_model.updated_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.updated_at is not None else None,
             'isResolved': object_model.is_resolved,
-            'attachments': []
+            'attachments': await select_all_tickets_attachments_by_ticket_id(session=session, ticket_id=object_model.id)
+
         } for object_model in object_models
     ]
     
@@ -276,13 +279,36 @@ async def select_all_tickets_by_assignee_id(session: AsyncSession, assignee_id: 
             'createdAt': object_model.created_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.created_at is not None else None,
             'updatedAt': object_model.updated_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.updated_at is not None else None,
             'isResolved': object_model.is_resolved,
-            'attachments': []
+            'attachments': await select_all_tickets_attachments_by_ticket_id(session=session, ticket_id=object_model.id)
         } for object_model in object_models
     ]
     
     return data
 
 
+async def select_all_tickets_attachments_by_ticket_id(session: AsyncSession, ticket_id: UUID):
+    statement = (
+        select(TicketAttachments)
+        .where(TicketAttachments.ticket_id == ticket_id)
+    )
+    result = await session.execute(statement)
+    object_models = result.scalars().all()
+    
+    data = [
+        {
+            'id': object_model.id,
+            'ticketId': object_model.ticket_id,
+            'fileName': object_model.file_name,
+            'fileStorageName': object_model.file_uuid_name,
+            'filePath': object_model.file_path,
+            'fileSize': object_model.file_size,
+            'mimeType': object_model.mime_type,
+            'createdAt': object_model.created_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.created_at is not None else None,
+        } for object_model in object_models
+    ]
+    
+    return data
+    
 async def select_all_tickets_for_manager(session: AsyncSession):
     statement = (
         select(Tickets)
@@ -317,7 +343,7 @@ async def select_all_tickets_for_manager(session: AsyncSession):
             'createdAt': object_model.created_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.created_at is not None else None,
             'updatedAt': object_model.updated_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.updated_at is not None else None,
             'isResolved': object_model.is_resolved,
-            'attachments': []
+            'attachments': await select_all_tickets_attachments_by_ticket_id(session=session, ticket_id=object_model.id)
         } for object_model in object_models
     ]
     
@@ -365,7 +391,7 @@ async def select_all_finished_tickets_by_requester_id(session: AsyncSession, req
             'createdAt': object_model.created_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.created_at is not None else None,
             'updatedAt': object_model.updated_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.updated_at is not None else None,
             'isResolved': object_model.is_resolved,
-            'attachments': []
+            'attachments': await select_all_tickets_attachments_by_ticket_id(session=session, ticket_id=object_model.id)
         } for object_model in object_models
     ]
 

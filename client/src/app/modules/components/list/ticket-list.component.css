@@ -283,13 +283,32 @@
 
 .inbox-filters {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr)) auto;
   gap: 12px;
-  align-items: end;
+  align-items: stretch;
   margin-bottom: 12px;
 }
 .inbox-filter-checkbox { display: inline-flex; align-items: center; gap: 6px; }
-.inbox-filter-reset { height: 40px; }
+.inbox-filter-reset {
+  width: 48px;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  border-radius: 12px;
+  background: rgba(248, 250, 252, 0.9);
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+  color: #0f172a;
+  align-self: end;
+}
+
+.inbox-filter-reset:hover {
+  border-color: #2563eb;
+  box-shadow: 0 10px 24px -20px rgba(37, 99, 235, 0.4);
+}
 
 @media (max-width: 720px) {
   .inbox-card {

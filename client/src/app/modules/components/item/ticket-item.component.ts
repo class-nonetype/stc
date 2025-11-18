@@ -2,12 +2,13 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ChangeDetectorRef, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { Ticket } from '../../interfaces/ticket.interface';
+import { Ticket, TicketAttachment } from '../../interfaces/ticket.interface';
 import { AuthenticationSessionService } from '../../services/authentication.service';
 import { MatButton, MatButtonModule } from '@angular/material/button';
 import { TicketService } from '../../services/ticket.service';
 import { MatChipsModule } from '@angular/material/chips';
 import type { LevelType } from '../../interfaces/ticket.interface';
+import { environment } from '@environments/environment';
 
 @Component({
   selector: 'ticket-list-item',
@@ -75,12 +76,36 @@ export class TicketListItemComponent {
     return `ticket-chip--${key}`;
   }
 
+  statusIcon(statusType: LevelType): string {
+    const key = this.mapStatusKey(statusType.description);
+    switch (key) {
+      case 'open':
+        return 'flag';
+      case 'in_progress':
+        return 'autorenew';
+      case 'on_hold':
+        return 'schedule';
+      case 'resolved':
+        return 'check_circle';
+      case 'closed':
+        return 'task_alt';
+      case 'cancelled':
+        return 'cancel';
+      default:
+        return 'flag';
+    }
+  }
+
   get lastUpdated(): string {
-    return this.ticket.updatedAt ?? this.ticket.createdAt ?? 'Sin fecha';
+    return this.formatDate(this.ticket.updatedAt) ?? this.formatDate(this.ticket.createdAt) ?? 'Sin fecha';
   }
 
   get noteText(): string {
     return this.ticket.note?.trim() || 'Sin descripción disponible.';
+  }
+
+  get attachments(): TicketAttachment[] {
+    return Array.isArray(this.ticket.attachments) ? this.ticket.attachments : [];
   }
 
   get statusKey(): string {
@@ -89,6 +114,52 @@ export class TicketListItemComponent {
       return base;
     }
     return this.ticket.isResolved ? 'resolved' : 'open';
+  }
+
+  attachmentHref(attachment: TicketAttachment): string | null {
+    if (this.ticket.id && attachment.id) {
+      return `${environment.apiUrl}/application/download/ticket/${this.ticket.id}/attachments/${attachment.id}`;
+    }
+    return attachment.url ?? attachment.filePath ?? null;
+  }
+
+  attachmentLabel(attachment: TicketAttachment): string {
+    return attachment.fileName || 'Archivo adjunto';
+  }
+
+  private normalizeSize(value?: number | null): number | null {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+    return null;
+  }
+
+  attachmentSize(attachment: TicketAttachment): string | null {
+    const size = this.normalizeSize(attachment.fileSize);
+    if (size == null) return null;
+    if (size >= 1024 * 1024) return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+    if (size >= 1024) return `${(size / 1024).toFixed(1)} KB`;
+    return `${size} B`;
+  }
+
+  private formatDate(source?: string | null): string | null {
+    if (!source) return null;
+    const date = new Date(source);
+    if (Number.isNaN(date.getTime())) return source;
+
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    const mm = pad(date.getMonth() + 1);
+    const dd = pad(date.getDate());
+    let hour = date.getHours();
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12;
+    if (hour === 0) hour = 12;
+    const hh = pad(hour);
+    const mi = pad(date.getMinutes());
+    const ss = pad(date.getSeconds());
+
+    return `${dd}/${mm}/${yyyy} ${hh}:${mi}:${ss} ${ampm}`;
   }
 
   onTakeTicket(): void {

@@ -1,178 +1,155 @@
-@if ( userIsAuthenticated ) {
+@if (userIsAuthenticated) {
   <article class="ticket-detail">
-    @if ( userTeam === 'Soporte' ){
-      <header class="ticket-detail-header">
-        <div class="ticket-detail-heading">
 
-          <div class="ticket-detail-heading-text">
-            <span
-              class="ticket-status-dot"
-              [class.ticket-status-dot--on-hold]="statusKey === 'on_hold'"
-              [class.ticket-status-dot--in-progress]="statusKey === 'in_progress'"
-              [class.ticket-status-dot--default]="statusKey !== 'on_hold' && statusKey !== 'in_progress'"
-              aria-hidden="true"
-            ></span>
-            <p class="ticket-detail-eyebrow">SOPORTE | Detalle del ticket</p>
-            <h2 class="ticket-detail-title">{{ displayTitle }}</h2>
-          </div>
+    <header class="ticket-detail-header">
+      <div class="ticket-detail-heading">
+
+        <!--
+        <span
+          class="ticket-status-dot"
+          [class.ticket-status-dot--on-hold]="statusKey === 'on_hold'"
+          [class.ticket-status-dot--in-progress]="statusKey === 'in_progress'"
+          [class.ticket-status-dot--default]="statusKey !== 'on_hold' && statusKey !== 'in_progress'"
+          aria-hidden="true"
+        ></span>
+        -->
+        <div class="ticket-detail-heading-text">
+          <!-- <p class="ticket-detail-eyebrow">{{ userTeam?.toUpperCase() }} | {{ lastUpdated }}</p> -->
+          <h1 class="ticket-detail-title">{{ displayTitle }}</h1>
+          <span class="ticket-detail-panel-label">
+            {{ lastUpdated }}
+          </span>
         </div>
-        <button type="button" class="ticket-detail-close" (click)="onClose()" aria-label="Cerrar dialogo">
-          <mat-icon aria-hidden="true">close</mat-icon>
-        </button>
-
-      </header>
-
-      <div class="ticket-detail-chips">
-        <span class="ticket-pill ticket-pill--code">{{ ticket.code }}</span>
-        <span class="ticket-pill" [ngClass]="statusAccentClass">
-          <span class="ticket-pill-label">Estado</span>
-          <span class="ticket-pill-value">{{ statusLabel }}</span>
-        </span>
-        <span class="ticket-pill">
-          <span class="ticket-pill-label">Tipo</span>
-          <span class="ticket-pill-value">{{ requestLabel }}</span>
-        </span>
-        <span class="ticket-pill">
-          <span class="ticket-pill-label">Prioridad</span>
-          <span class="ticket-pill-value">{{ priorityLabel }}</span>
-        </span>
       </div>
+      <button type="button" class="ticket-detail-close" (click)="onClose()" aria-label="Cerrar dialogo">
+        <mat-icon aria-hidden="true">close</mat-icon>
+      </button>
+    </header>
 
+    <div class="ticket-detail-chips">
+
+      <span class="ticket-pill ticket-pill--code">{{ ticket.code }}</span>
+
+      <span class="ticket-pill" [ngClass]="statusAccentClass">
+        <span class="ticket-pill-label">Estado</span>
+        <span class="ticket-pill-value">{{ statusLabel }}</span>
+      </span>
+      <span class="ticket-pill">
+        <span class="ticket-pill-label">Tipo</span>
+        <span class="ticket-pill-value">{{ requestLabel }}</span>
+      </span>
+      <span class="ticket-pill">
+        <span class="ticket-pill-label">Prioridad</span>
+        <span class="ticket-pill-value">{{ priorityLabel }}</span>
+      </span>
+    </div>
+
+
+
+    @if (userTeam === 'Asesoría') {
       <section class="ticket-detail-panel">
         <header class="ticket-detail-panel-heading">
-          <span class="ticket-detail-panel-label">Solicitante</span>
+          <span class="ticket-detail-panel-label">
+            <mat-icon aria-hidden="true" class="ticket-detail-panel-icon">supervisor_account</mat-icon>
+            Encargado
+          </span>
+        </header>
+        <div class="ticket-detail-panel-body">
+          <p class="ticket-detail-panel-title">{{ managerDisplayName }}</p>
+        </div>
+      </section>
+    } @else if ( userTeam === 'Soporte' ){
+      <section class="ticket-detail-panel">
+        <header class="ticket-detail-panel-heading">
+          <span class="ticket-detail-panel-label">
+            <mat-icon aria-hidden="true" class="ticket-detail-panel-icon">person</mat-icon>
+            Solicitante
+          </span>
+
+
+
         </header>
         <div class="ticket-detail-panel-body">
           <p class="ticket-detail-panel-title">{{ requesterDisplayName }}</p>
         </div>
       </section>
+    }
 
-      <section class="ticket-detail-panel ticket-detail-panel--description">
+    <section class="ticket-detail-panel ticket-detail-panel--description">
+      <header class="ticket-detail-panel-heading">
+        <span class="ticket-detail-panel-label">
+          <mat-icon aria-hidden="true" class="ticket-detail-panel-icon">description</mat-icon>
+          Descripcion
+        </span>
+      </header>
+      <div class="ticket-detail-panel-body">
+        <p class="ticket-detail-panel-text">
+          {{ noteText }}
+        </p>
+      </div>
+    </section>
+
+    @if (attachments.length) {
+      <section class="ticket-detail-panel ticket-detail-panel--attachments">
         <header class="ticket-detail-panel-heading">
-          <span class="ticket-detail-panel-label">Descripcion</span>
+          <span class="ticket-detail-panel-label">
+            <mat-icon aria-hidden="true" class="ticket-detail-panel-icon">attach_file</mat-icon>
+            Adjuntos
+          </span>
+          <span class="ticket-detail-panel-subtitle">{{ attachments.length }} archivos</span>
         </header>
-        <div class="ticket-detail-panel-body">
-          <p class="ticket-detail-panel-text">
-            {{ noteText }}
-          </p>
+
+        <div class="sidenav-attachments-list">
+          <div class="sidenav-attachments-chips">
+            @for (attachment of attachments; track attachment.id) {
+              <a class="sidenav-attachment" [href]="attachmentHref(attachment)" target="_blank" rel="noopener">
+                <mat-icon aria-hidden="true">attach_file</mat-icon>
+                <div class="sidenav-attachment-info">
+                  <span class="sidenav-attachment-name">{{ attachmentLabel(attachment) }}</span>
+                  @if (attachmentSize(attachment)) {
+                    <span class="sidenav-attachment-size">{{ attachmentSize(attachment) }}</span>
+                  }
+                </div>
+              </a>
+            }
+          </div>
         </div>
       </section>
+    }
 
-      <section class="ticket-detail-panel">
-        <header class="ticket-detail-panel-heading">
-          <span class="ticket-detail-panel-label">Última actualización</span>
-        </header>
-        <div class="ticket-detail-panel-body">
-          <p class="ticket-detail-panel-title">{{ lastUpdated }}</p>
-        </div>
-      </section>
 
-      @if (!ticket.managerId) {
+
+
+    @if (!ticket.managerId && userTeam === 'Soporte') {
       <section class="ticket-detail-panel">
         <button mat-flat-button color="primary" type="button" (click)="onTakeTicket()">
           <mat-icon aria-hidden="true">emoji_people</mat-icon>
           Tomar ticket
         </button>
       </section>
-      } @else if (ticket.status !== 'En espera') {
-
-        <section class="ticket-detail-panel">
-          <header class="ticket-detail-panel-heading">
-            <span class="ticket-detail-panel-label">Cambiar estado</span>
-          </header>
-          <div class="ticket-detail-panel-body">
-            <mat-chip-listbox class="ticket-status-chip-set" aria-label="Estados disponibles">
-              @for (statusType of statusTypes; track statusType.id) {
-                <mat-chip-option
-                  [selected]="ticket.statusTypeId === statusType.id"
-                  [ngClass]="statusChipClass(statusType)"
-                  (selectionChange)="onStatusSelected(statusType.id, $event.selected)">
-                  {{ statusType.description ?? 'Sin estado' }}
-                </mat-chip-option>
-              }
-            </mat-chip-listbox>
-          </div>
-        </section>
-
-      }
-
-
-
-
-
-    } @else if ( userTeam === 'Asesoría' ){
-      <header class="ticket-detail-header">
-        <div class="ticket-detail-heading">
-          <span
-            class="ticket-status-dot"
-            [class.ticket-status-dot--on-hold]="statusKey === 'on_hold'"
-            [class.ticket-status-dot--in-progress]="statusKey === 'in_progress'"
-            [class.ticket-status-dot--default]="statusKey !== 'on_hold' && statusKey !== 'in_progress'"
-            aria-hidden="true"
-          ></span>
-          <div class="ticket-detail-heading-text">
-            <p class="ticket-detail-eyebrow">ASESORÍA | Detalle del ticket</p>
-            <h2 class="ticket-detail-title">{{ displayTitle }}</h2>
-          </div>
-        </div>
-        <button type="button" class="ticket-detail-close" (click)="onClose()" aria-label="Cerrar dialogo">
-          <mat-icon aria-hidden="true">close</mat-icon>
-        </button>
-      </header>
-
-      <div class="ticket-detail-chips">
-        <span class="ticket-pill ticket-pill--code">{{ ticket.code }}</span>
-        <span class="ticket-pill" [ngClass]="statusAccentClass">
-          <span class="ticket-pill-label">Estado</span>
-          <span class="ticket-pill-value">{{ statusLabel }}</span>
-        </span>
-        <span class="ticket-pill">
-          <span class="ticket-pill-label">Tipo</span>
-          <span class="ticket-pill-value">{{ requestLabel }}</span>
-        </span>
-        <span class="ticket-pill">
-          <span class="ticket-pill-label">Prioridad</span>
-          <span class="ticket-pill-value">{{ priorityLabel }}</span>
-        </span>
-      </div>
-
+    } @else if (ticket.status !== 'En espera' && userTeam === 'Soporte') {
       <section class="ticket-detail-panel">
         <header class="ticket-detail-panel-heading">
-          <span class="ticket-detail-panel-label">Encargado</span>
-        </header>
-
-        @if ( managerDisplayName ){
-          <div class="ticket-detail-panel-body">
-            <p class="ticket-detail-panel-title">{{ managerDisplayName }}</p>
-          </div>
-        } @else {
-          <div class="ticket-detail-panel-body">
-            <p class="ticket-detail-panel-title">No hay un encargado aún</p>
-          </div>
-        }
-
-      </section>
-
-      <section class="ticket-detail-panel ticket-detail-panel--description">
-        <header class="ticket-detail-panel-heading">
-          <span class="ticket-detail-panel-label">Descripcion</span>
+          <span class="ticket-detail-panel-label">Cambiar estado</span>
         </header>
         <div class="ticket-detail-panel-body">
-          <p class="ticket-detail-panel-text">
-            {{ noteText }}
-          </p>
-        </div>
-      </section>
-
-      <section class="ticket-detail-panel">
-        <header class="ticket-detail-panel-heading">
-          <span class="ticket-detail-panel-label">Última actualización</span>
-        </header>
-        <div class="ticket-detail-panel-body">
-          <p class="ticket-detail-panel-title">{{ lastUpdated }}</p>
+          <mat-chip-listbox
+            class="ticket-status-chips"
+            selectionMode="single"
+            [value]="[ticket.statusTypeId]"
+            aria-label="Estados disponibles"
+          >
+            @for (statusType of statusTypes; track statusType.id) {
+              <mat-chip-option
+                [value]="statusType.id"
+                (selectionChange)="onStatusSelected(statusType.id, $event.selected)"
+              >
+                {{ statusType.description ?? 'Sin estado' }}
+              </mat-chip-option>
+            }
+          </mat-chip-listbox>
         </div>
       </section>
     }
-
   </article>
 }

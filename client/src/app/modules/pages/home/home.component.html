@@ -14,8 +14,9 @@
         <mat-card
           class="dashboard-option-card"
           role="button"
-          tabindex="0"
-          (click)="dashboardOption.click()">
+          [class.dashboard-option-card--disabled]="dashboardOption.disabled"
+          [attr.tabindex]="dashboardOption.disabled ? -1 : 0"
+          (click)="!dashboardOption.disabled && dashboardOption.click()">
           <div class="dashboard-option-icon" aria-hidden="true">
             <mat-icon class="dashboard-option-icon-main">
               {{ dashboardOption.icon }}
@@ -54,8 +55,9 @@
         <mat-card
           class="dashboard-option-card"
           role="button"
-          tabindex="0"
-          (click)="dashboardOption.click()">
+          [class.dashboard-option-card--disabled]="dashboardOption.disabled"
+          [attr.tabindex]="dashboardOption.disabled ? -1 : 0"
+          (click)="!dashboardOption.disabled && dashboardOption.click()">
           <div class="dashboard-option-icon" aria-hidden="true">
             <mat-icon class="dashboard-option-icon-main">
               {{ dashboardOption.icon }}
@@ -83,7 +85,7 @@
 
               @if ( dashboardOption.value == 0 ) {
                 <!-- <strong class="dashboard-card-value">AA�n no ha finalizado ningA�n ticket.</strong> -->
-                <p>AA�n no hay avance en el ticket.</p>
+                <p>Aún no hay avance en el ticket.</p>
               } @else {
                 <strong class="dashboard-card-value">{{ dashboardOption.value }}</strong>
                 <!-- <span class="dashboard-card-trend">{{ dashboardOption.trend }}</span> -->
@@ -149,8 +151,9 @@
         <mat-card
           class="dashboard-option-card"
           role="button"
-          tabindex="0"
-          (click)="dashboardOption.click()">
+          [class.dashboard-option-card--disabled]="dashboardOption.disabled"
+          [attr.tabindex]="dashboardOption.disabled ? -1 : 0"
+          (click)="!dashboardOption.disabled && dashboardOption.click()">
           <div class="dashboard-option-icon" aria-hidden="true">
             <mat-icon class="dashboard-option-icon-main">
               {{ dashboardOption.icon }}
