@@ -1,3 +1,11 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
 .inbox-header {
   margin: 0 0 6px;
 }
@@ -26,6 +34,18 @@
 
 .page {
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: 12px;
+  overflow: hidden;
+}
+
+ticket-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
 }
 .inbox-hero {
   margin: 0 0 8px;

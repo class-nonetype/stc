@@ -52,10 +52,10 @@ async def create_users(session: AsyncSession = Depends(database)):
         schema=SignUpRequest(
             UserProfile=UserProfile(
                 full_name='liliana leonor vivanco riquelme',
-                email='lleonor@consejodeauditoria.gob.cl',
+                email='lvivanco@consejodeauditoria.gob.cl',
                 is_active=True),
             UserAccount=UserAccount(
-                username='lleonor',
+                username='lvivanco',
                 password='12345678'),
             TeamGroup=TeamGroup(id=audit_group_id)
         )
@@ -98,10 +98,10 @@ async def create_users(session: AsyncSession = Depends(database)):
         schema=SignUpRequest(
             UserProfile=UserProfile(
                 full_name='daniel robinson santelices candia',
-                email='drobinson@consejodeauditoria.gob.cl',
+                email='dsantelices@consejodeauditoria.gob.cl',
                 is_active=True),
             UserAccount=UserAccount(
-                username='drobinson',
+                username='dsantelices',
                 password='12345678'),
             TeamGroup=TeamGroup(id=support_group_id)
         )

@@ -69,136 +69,6 @@
         </button>
       </mat-form-field>
     </div>
-  </section>
-
-  @if (loading()) {
-    <div class="inbox-skeleton" role="presentation" aria-hidden="true">
-      <div class="s-row"></div>
-      <div class="s-row"></div>
-      <div class="s-row"></div>
-    </div>
-  } @else if (hasError()) {
-    <div class="inbox-error" role="alert">
-      <div class="inbox-error-content">
-        <h2 class="inbox-error-title">No pudimos cargar los tickets</h2>
-        <p>Revisa tu conexion e intentalo nuevamente.</p>
-      </div>
-      <button type="button" class="inbox-error-action" (click)="onRetry()">Reintentar</button>
-    </div>
-  } @else if (!tickets().length) {
-    <div class="inbox-empty" role="status">
-      <div class="inbox-empty-icon">
-        <mat-icon aria-hidden="true">assignment_late</mat-icon>
-      </div>
-      <p class="inbox-empty-message">Sin tickets pendientes</p>
-      <p class="inbox-empty-hint">Todo esta en orden por ahora.</p>
-    </div>
-  } @else {
-    <div class="inbox-list" role="list">
-      @for (ticket of visibleTickets(); track ticket.id) {
-
-        @if ( getCurrentUserTeam() == 'Soporte') {
-          @if ( getCurrentUserId() === ticket.managerId || !ticket.managerId ){
-            <article
-              class="inbox-card"
-              role="listitem"
-              [class.inbox-card--unread]="isUnread(ticket)"
-              (click)="onOpen(ticket)"
-            >
-              <div class="inbox-card-icon" aria-hidden="true">
-                <mat-icon>{{ isUnread(ticket) ? 'mark_email_unread' : 'drafts' }}</mat-icon>
-              </div>
-
-              <div class="inbox-card-content">
-                <div class="inbox-card-header">
-                  <div class="inbox-card-pills">
-                    <span class="inbox-card-code">{{ ticket.code }}</span>
-                    <span
-                      class="inbox-card-priority"
-                      [class.inbox-card-priority--low]="priorityKey(ticket) === 'low'"
-                      [class.inbox-card-priority--medium]="priorityKey(ticket) === 'medium'"
-                      [class.inbox-card-priority--high]="priorityKey(ticket) === 'high'"
-                      [class.inbox-card-priority--critical]="priorityKey(ticket) === 'critical'"
-                    >
-                      {{ ticket.priority }}
-                    </span>
-                    <span
-                      class="inbox-card-status"
-                      [class.inbox-card-status--open]="statusKey(ticket) === 'open'"
-                      [class.inbox-card-status--in-progress]="statusKey(ticket) === 'in_progress'"
-                      [class.inbox-card-status--on-hold]="statusKey(ticket) === 'on_hold'"
-                      [class.inbox-card-status--resolved]="statusKey(ticket) === 'resolved'"
-                      [class.inbox-card-status--closed]="statusKey(ticket) === 'closed'"
-                      [class.inbox-card-status--cancelled]="statusKey(ticket) === 'cancelled'"
-                    >
-                      {{ statusLabel(ticket) }}
-                    </span>
-                  </div>
-                  <h2 class="inbox-card-title">{{ titleLabel(ticket) }}</h2>
-                </div>
-
-                <p class="inbox-card-from">Solicitante - {{ requesterLabel(ticket) }}</p>
-              </div>
-
-              <div class="inbox-card-meta">
-                @if ( ticket.managerId ){
-                  <div class="inbox-card-time-icon" aria-hidden="true">
-                    <mat-icon>how_to_reg</mat-icon>
-                  </div>
-                }
-              </div>
-            </article>
-          }
-        }
-        @else if ( getCurrentUserTeam() == 'Asesoría' ){
-          <article
-            class="inbox-card"
-            role="listitem"
-            [class.inbox-card--unread]="isUnread(ticket)"
-            (click)="onOpen(ticket)"
-          >
-            <div class="inbox-card-icon" aria-hidden="true">
-              <mat-icon>{{ isUnread(ticket) ? 'mark_email_unread' : 'drafts' }}</mat-icon>
-            </div>
-
-            <div class="inbox-card-content">
-              <div class="inbox-card-header">
-                <div class="inbox-card-pills">
-                  <span class="inbox-card-code">{{ ticket.code }}</span>
-                  <span
-                    class="inbox-card-priority"
-                    [class.inbox-card-priority--low]="priorityKey(ticket) === 'low'"
-                    [class.inbox-card-priority--medium]="priorityKey(ticket) === 'medium'"
-                    [class.inbox-card-priority--high]="priorityKey(ticket) === 'high'"
-                    [class.inbox-card-priority--critical]="priorityKey(ticket) === 'critical'"
-                  >
-                    {{ ticket.priority }}
-                  </span>
-                  <span class="inbox-card-status">{{ statusLabel(ticket) }}</span>
-                </div>
-                <h2 class="inbox-card-title">{{ titleLabel(ticket) }}</h2>
-              </div>
-
-              @if ( getManagerFullName(ticket) !== 'Sin encargado' ) {
-                <p class="inbox-card-from">Encargado - {{ getManagerFullName(ticket) }}</p>
-              }
-              @else {
-                <p class="inbox-card-from">Sin encargado por el momento</p>
-              }
-
-            </div>
-
-            <div class="inbox-card-meta">
-              @if ( ticket.managerId ){
-                <div class="inbox-card-time-icon" aria-hidden="true">
-                  <mat-icon>lock_clock</mat-icon>
-                </div>
-              }
-            </div>
-          </article>
-        }
-      }
-    </div>
 
     <mat-paginator
       class="inbox-paginator"
@@ -210,5 +80,147 @@
       showFirstLastButtons
       aria-label="Paginacion de tickets"
     ></mat-paginator>
-  }
+
+  </section>
+
+  <div class="inbox-results">
+    @if (loading()) {
+      <div class="inbox-skeleton" role="presentation" aria-hidden="true">
+        <div class="s-row"></div>
+        <div class="s-row"></div>
+        <div class="s-row"></div>
+      </div>
+    } @else if (hasError()) {
+      <div class="inbox-error" role="alert">
+        <div class="inbox-error-content">
+          <h2 class="inbox-error-title">No pudimos cargar los tickets</h2>
+          <p>Revisa tu conexion e intentalo nuevamente.</p>
+        </div>
+        <button type="button" class="inbox-error-action" (click)="onRetry()">Reintentar</button>
+      </div>
+    } @else if (!tickets().length) {
+      <div class="inbox-empty" role="status">
+        <div class="inbox-empty-icon">
+          <mat-icon aria-hidden="true">assignment_late</mat-icon>
+        </div>
+        <p class="inbox-empty-message">Sin tickets pendientes</p>
+        <p class="inbox-empty-hint">Todo esta en orden por ahora.</p>
+      </div>
+    } @else {
+      <mat-list class="inbox-list" aria-label="Bandeja de tickets">
+        @for (ticket of visibleTickets(); track ticket.id) {
+          @if ( getCurrentUserTeam() == 'Soporte') {
+            @if ( getCurrentUserId() === ticket.managerId || !ticket.managerId ){
+              <button
+                mat-list-item
+                class="inbox-card-item"
+                type="button"
+                (click)="onOpen(ticket)"
+              >
+                <div
+                  class="inbox-card"
+                  [class.inbox-card--unread]="isUnread(ticket)"
+                >
+                  <div class="inbox-card-icon" aria-hidden="true">
+                    <mat-icon>{{ isUnread(ticket) ? 'mark_email_unread' : 'drafts' }}</mat-icon>
+                  </div>
+
+                  <div class="inbox-card-content">
+                    <div class="inbox-card-header">
+                      <div class="inbox-card-pills">
+                        <span class="inbox-card-code">{{ ticket.code }}</span>
+                        <span
+                          class="inbox-card-priority"
+                          [class.inbox-card-priority--low]="priorityKey(ticket) === 'low'"
+                          [class.inbox-card-priority--medium]="priorityKey(ticket) === 'medium'"
+                          [class.inbox-card-priority--high]="priorityKey(ticket) === 'high'"
+                          [class.inbox-card-priority--critical]="priorityKey(ticket) === 'critical'"
+                        >
+                          {{ ticket.priority }}
+                        </span>
+                        <span
+                          class="inbox-card-status"
+                          [class.inbox-card-status--open]="statusKey(ticket) === 'open'"
+                          [class.inbox-card-status--in-progress]="statusKey(ticket) === 'in_progress'"
+                          [class.inbox-card-status--on-hold]="statusKey(ticket) === 'on_hold'"
+                          [class.inbox-card-status--resolved]="statusKey(ticket) === 'resolved'"
+                          [class.inbox-card-status--closed]="statusKey(ticket) === 'closed'"
+                          [class.inbox-card-status--cancelled]="statusKey(ticket) === 'cancelled'"
+                        >
+                          {{ statusLabel(ticket) }}
+                        </span>
+                      </div>
+                      <h2 class="inbox-card-title">{{ titleLabel(ticket) }}</h2>
+                    </div>
+
+                    <p class="inbox-card-from">Solicitante - {{ requesterLabel(ticket) }}</p>
+                  </div>
+
+                  <div class="inbox-card-meta">
+                    @if ( ticket.managerId ){
+                      <div class="inbox-card-time-icon" aria-hidden="true">
+                        <mat-icon>how_to_reg</mat-icon>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </button>
+            }
+          }
+          @else if ( getCurrentUserTeam() == 'Asesoría' ){
+            <button
+              mat-list-item
+              class="inbox-card-item"
+              type="button"
+              (click)="onOpen(ticket)"
+            >
+              <div
+                class="inbox-card"
+                [class.inbox-card--unread]="isUnread(ticket)"
+              >
+                <div class="inbox-card-icon" aria-hidden="true">
+                  <mat-icon>{{ isUnread(ticket) ? 'mark_email_unread' : 'drafts' }}</mat-icon>
+                </div>
+
+                <div class="inbox-card-content">
+                  <div class="inbox-card-header">
+                    <div class="inbox-card-pills">
+                      <span class="inbox-card-code">{{ ticket.code }}</span>
+                      <span
+                        class="inbox-card-priority"
+                        [class.inbox-card-priority--low]="priorityKey(ticket) === 'low'"
+                        [class.inbox-card-priority--medium]="priorityKey(ticket) === 'medium'"
+                        [class.inbox-card-priority--high]="priorityKey(ticket) === 'high'"
+                        [class.inbox-card-priority--critical]="priorityKey(ticket) === 'critical'"
+                      >
+                        {{ ticket.priority }}
+                      </span>
+                      <span class="inbox-card-status">{{ statusLabel(ticket) }}</span>
+                    </div>
+                    <h2 class="inbox-card-title">{{ titleLabel(ticket) }}</h2>
+                  </div>
+
+                  @if ( getManagerFullName(ticket) !== 'Sin encargado' ) {
+                    <p class="inbox-card-from">Encargado - {{ getManagerFullName(ticket) }}</p>
+                  }
+                  @else {
+                    <p class="inbox-card-from">Sin encargado por el momento</p>
+                  }
+
+                </div>
+
+                <div class="inbox-card-meta">
+                  @if ( ticket.managerId ){
+                    <div class="inbox-card-time-icon" aria-hidden="true">
+                      <mat-icon>lock_clock</mat-icon>
+                    </div>
+                  }
+                </div>
+              </div>
+            </button>
+          }
+        }
+      </mat-list>
+    }
+  </div>
 </section>

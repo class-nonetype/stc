@@ -17,6 +17,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { AuthenticationSessionService } from '../../services/authentication.service';
 import { MatButtonModule } from '@angular/material/button';
+import { MatListModule } from '@angular/material/list';
 
 
 
@@ -46,7 +47,8 @@ interface TicketFilters {
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatButtonModule
+    MatButtonModule,
+    MatListModule
   ],
   templateUrl: './ticket-list.component.html',
   styleUrl: './ticket-list.component.css',
