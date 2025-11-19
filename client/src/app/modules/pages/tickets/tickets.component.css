@@ -1,0 +1,32 @@
+.inbox-header {
+  margin: 0 0 6px;
+}
+
+.inbox-header__eyebrow {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.inbox-header__title {
+  margin: 0 0 2px;
+  font-size: clamp(1.4rem, 3vw, 1.8rem);
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.inbox-header__subtitle {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.98rem;
+}
+
+.page {
+  padding: 0;
+}
+.inbox-hero {
+  margin: 0 0 8px;
+}

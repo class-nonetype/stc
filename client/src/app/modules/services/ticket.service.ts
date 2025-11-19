@@ -145,6 +145,10 @@ export class TicketService {
     }
 
     const endpointPath = this.getTicketsEndpointForTeam(userId);
+
+    console.log('Cargando los tickets desde: ', endpointPath);
+
+
     if (!endpointPath) {
       this.hasError.set(true);
       console.warn('No ticket endpoint available for the current team.');
@@ -234,7 +238,7 @@ export class TicketService {
       return endpoints.tickets.getTotalTicketsByRequesterUserId(userId);
     }
     if (role === 'Soporte') {
-      return endpoints.tickets.getTotalTicketsByManagerUserId(userId);
+      return endpoints.tickets.getTotalTicketsByManagerUser;
     }
     return null;
   }
@@ -347,7 +351,7 @@ export class TicketService {
       priority: this.toNullableString(schema.priority),
       statusTypeId: this.toNullableString(schema.statusTypeId),
       status: this.toNullableString(schema.status),
-      requesterId: this.ensureString(schema.requesterId, 'Sin solicitante'),
+      requesterId: this.ensureString(schema.requesterId, 'Sin encargado'),
       managerId: this.toNullableString(schema.managerId),
       requester: this.toNullableString(schema.requester),
       manager: this.toNullableString(schema.manager),

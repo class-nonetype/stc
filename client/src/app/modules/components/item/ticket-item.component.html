@@ -30,15 +30,22 @@
 
       <span class="ticket-pill ticket-pill--code">{{ ticket.code }}</span>
 
+
       <span class="ticket-pill" [ngClass]="statusAccentClass">
         <span class="ticket-pill-label">Estado</span>
         <span class="ticket-pill-value">{{ statusLabel }}</span>
       </span>
+
+
+
+      <!--
       <span class="ticket-pill">
         <span class="ticket-pill-label">Tipo</span>
         <span class="ticket-pill-value">{{ requestLabel }}</span>
       </span>
-      <span class="ticket-pill">
+      -->
+
+      <span class="ticket-pill" [ngClass]="priorityAccentClass">
         <span class="ticket-pill-label">Prioridad</span>
         <span class="ticket-pill-value">{{ priorityLabel }}</span>
       </span>
@@ -46,7 +53,7 @@
 
 
 
-    @if (userTeam === 'Asesoría') {
+    @if ( userTeam === 'Asesoría' ) {
       <section class="ticket-detail-panel">
         <header class="ticket-detail-panel-heading">
           <span class="ticket-detail-panel-label">
@@ -65,9 +72,6 @@
             <mat-icon aria-hidden="true" class="ticket-detail-panel-icon">person</mat-icon>
             Solicitante
           </span>
-
-
-
         </header>
         <div class="ticket-detail-panel-body">
           <p class="ticket-detail-panel-title">{{ requesterDisplayName }}</p>
@@ -89,7 +93,7 @@
       </div>
     </section>
 
-    @if (attachments.length) {
+    @if ( attachments.length ) {
       <section class="ticket-detail-panel ticket-detail-panel--attachments">
         <header class="ticket-detail-panel-heading">
           <span class="ticket-detail-panel-label">
@@ -117,17 +121,17 @@
       </section>
     }
 
-
-
-
-    @if (!ticket.managerId && userTeam === 'Soporte') {
-      <section class="ticket-detail-panel">
-        <button mat-flat-button color="primary" type="button" (click)="onTakeTicket()">
-          <mat-icon aria-hidden="true">emoji_people</mat-icon>
-          Tomar ticket
-        </button>
-      </section>
-    } @else if (ticket.status !== 'En espera' && userTeam === 'Soporte') {
+    @if ( !ticket.managerId && userTeam === 'Soporte' ) {
+      <button mat-flat-button color="primary" type="button" (click)="onTakeTicket()">
+        <!--
+        lock_person
+        playlist_add_check_circle
+        -->
+        <mat-icon aria-hidden="true">lock</mat-icon>
+        Tomar ticket
+      </button>
+    <!-- } @else if (ticket.status !== 'En espera' && userTeam === 'Soporte') {-->
+    } @else if ( userTeam === 'Soporte' ) {
       <section class="ticket-detail-panel">
         <header class="ticket-detail-panel-heading">
           <span class="ticket-detail-panel-label">Cambiar estado</span>

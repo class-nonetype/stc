@@ -1,63 +1,75 @@
-<section class="inbox-container">
+﻿<section class="inbox-container">
 
   <!-- filtros -->
-  <div class="inbox-filters">
-    <mat-form-field appearance="outline">
-      <mat-label>Buscar</mat-label>
-      <input
-        matInput
-        #q
-        placeholder="Código, solicitante, nota…"
-        (input)="patchFilters('text', q.value)"
-      />
-    </mat-form-field>
+  <section class="filter-shell">
+    <header class="filter-shell-header">
+      <div>
+        <p class="filter-shell-eyebrow">Filtros</p>
+        <h2 class="filter-shell-title">Refina tu bandeja</h2>
+      </div>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Estado</mat-label>
-      <mat-select multiple [value]="filters().status"
-                  (selectionChange)="patchFilters('status', $event.value)">
-        @for (s of statusOptions(); track s) {
-          <mat-option [value]="s">{{ s }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+      <!--
+      <div class="filter-shell-actions">
+        <button mat-icon-button color="primary" type="button" (click)="resetFilters()" aria-label="Limpiar filtros">
+          <mat-icon aria-hidden="true">refresh</mat-icon>
+        </button>
+      </div>
+      -->
+    </header>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Tipo</mat-label>
-      <mat-select multiple [value]="filters().request"
-                  (selectionChange)="patchFilters('request', $event.value)">
-        @for (r of requestOptions(); track r) {
-          <mat-option [value]="r">{{ r }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+    <div class="filter-shell-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Buscar</mat-label>
+        <input
+          matInput
+          #q
+          placeholder="Codigo, solicitante, nota"
+          (input)="patchFilters('text', q.value)"
+        />
+        <button matSuffix mat-icon-button aria-label="Limpiar texto" (click)="q.value=''; patchFilters('text','')">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Prioridad</mat-label>
-      <mat-select multiple [value]="filters().priority"
-                  (selectionChange)="patchFilters('priority', $event.value)">
-        @for (p of priorityOptions(); track p) {
-          <mat-option [value]="p">{{ p }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Estado</mat-label>
+        <mat-select multiple [value]="filters().status"
+                    (selectionChange)="patchFilters('status', $event.value)">
+          @for (s of statusOptions(); track s) {
+            <mat-option [value]="s">{{ s }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Solicitante</mat-label>
-      <input matInput #rq (input)="patchFilters('requester', rq.value)" />
-    </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Tipo</mat-label>
+        <mat-select multiple [value]="filters().request"
+                    (selectionChange)="patchFilters('request', $event.value)">
+          @for (r of requestOptions(); track r) {
+            <mat-option [value]="r">{{ r }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
 
-    <!--
-    <button type="button" class="inbox-filter-reset" (click)="resetFilters()" aria-label="Limpiar filtros">
-      <mat-icon aria-hidden="true">backspace</mat-icon>
-    </button>
-    -->
-  </div>
+      <mat-form-field appearance="fill">
+        <mat-label>Prioridad</mat-label>
+        <mat-select multiple [value]="filters().priority"
+                    (selectionChange)="patchFilters('priority', $event.value)">
+          @for (p of priorityOptions(); track p) {
+            <mat-option [value]="p">{{ p }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
 
-
-
-
-
+      <mat-form-field appearance="fill">
+        <mat-label>Solicitante</mat-label>
+        <input matInput #rq (input)="patchFilters('requester', rq.value)" />
+        <button matSuffix mat-icon-button aria-label="Limpiar solicitante" (click)="rq.value=''; patchFilters('requester','')">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
+  </section>
 
   @if (loading()) {
     <div class="inbox-skeleton" role="presentation" aria-hidden="true">
@@ -85,13 +97,8 @@
     <div class="inbox-list" role="list">
       @for (ticket of visibleTickets(); track ticket.id) {
 
-
-
         @if ( getCurrentUserTeam() == 'Soporte') {
-
-          <!-- sólo muestra si el usuario actual es el encargado
-               o si no existe algún encargado en el ticket -->
-          @if ( getCurrentUserId() == ticket.managerId || !ticket.managerId ){
+          @if ( getCurrentUserId() === ticket.managerId || !ticket.managerId ){
             <article
               class="inbox-card"
               role="listitem"
@@ -107,6 +114,15 @@
                   <div class="inbox-card-pills">
                     <span class="inbox-card-code">{{ ticket.code }}</span>
                     <span
+                      class="inbox-card-priority"
+                      [class.inbox-card-priority--low]="priorityKey(ticket) === 'low'"
+                      [class.inbox-card-priority--medium]="priorityKey(ticket) === 'medium'"
+                      [class.inbox-card-priority--high]="priorityKey(ticket) === 'high'"
+                      [class.inbox-card-priority--critical]="priorityKey(ticket) === 'critical'"
+                    >
+                      {{ ticket.priority }}
+                    </span>
+                    <span
                       class="inbox-card-status"
                       [class.inbox-card-status--open]="statusKey(ticket) === 'open'"
                       [class.inbox-card-status--in-progress]="statusKey(ticket) === 'in_progress'"
@@ -121,18 +137,16 @@
                   <h2 class="inbox-card-title">{{ titleLabel(ticket) }}</h2>
                 </div>
 
-                @if ( getCurrentUserTeam() === 'Asesoría') {
-                  @if ( getManagerFullName(ticket) !== 'Sin solicitante' ) { <p class="inbox-card-from">Encargado · {{ getManagerFullName(ticket) }}</p> }
-                  @else { <p class="inbox-card-from">Sin encargado por el momento</p> }
-
-                } @else if ( getCurrentUserTeam() === 'Soporte') {
-                  <p class="inbox-card-from">Solicitante · {{ requesterLabel(ticket) }}</p>
-
-                }
-
+                <p class="inbox-card-from">Solicitante - {{ requesterLabel(ticket) }}</p>
               </div>
 
-              <time class="inbox-card-time">{{ updatedAgo(ticket) }}</time>
+              <div class="inbox-card-meta">
+                @if ( ticket.managerId ){
+                  <div class="inbox-card-time-icon" aria-hidden="true">
+                    <mat-icon>how_to_reg</mat-icon>
+                  </div>
+                }
+              </div>
             </article>
           }
         }
@@ -152,22 +166,21 @@
                 <div class="inbox-card-pills">
                   <span class="inbox-card-code">{{ ticket.code }}</span>
                   <span
-                    class="inbox-card-status"
-                    [class.inbox-card-status--open]="statusKey(ticket) === 'open'"
-                    [class.inbox-card-status--in-progress]="statusKey(ticket) === 'in_progress'"
-                    [class.inbox-card-status--on-hold]="statusKey(ticket) === 'on_hold'"
-                    [class.inbox-card-status--resolved]="statusKey(ticket) === 'resolved'"
-                    [class.inbox-card-status--closed]="statusKey(ticket) === 'closed'"
-                    [class.inbox-card-status--cancelled]="statusKey(ticket) === 'cancelled'"
+                    class="inbox-card-priority"
+                    [class.inbox-card-priority--low]="priorityKey(ticket) === 'low'"
+                    [class.inbox-card-priority--medium]="priorityKey(ticket) === 'medium'"
+                    [class.inbox-card-priority--high]="priorityKey(ticket) === 'high'"
+                    [class.inbox-card-priority--critical]="priorityKey(ticket) === 'critical'"
                   >
-                    {{ statusLabel(ticket) }}
+                    {{ ticket.priority }}
                   </span>
+                  <span class="inbox-card-status">{{ statusLabel(ticket) }}</span>
                 </div>
                 <h2 class="inbox-card-title">{{ titleLabel(ticket) }}</h2>
               </div>
 
-              @if ( getManagerFullName(ticket) !== 'Sin solicitante' ) {
-                <p class="inbox-card-from">Encargado · {{ getManagerFullName(ticket) }}</p>
+              @if ( getManagerFullName(ticket) !== 'Sin encargado' ) {
+                <p class="inbox-card-from">Encargado - {{ getManagerFullName(ticket) }}</p>
               }
               @else {
                 <p class="inbox-card-from">Sin encargado por el momento</p>
@@ -175,14 +188,18 @@
 
             </div>
 
-            <time class="inbox-card-time">{{ updatedAgo(ticket) }}</time>
+            <div class="inbox-card-meta">
+              @if ( ticket.managerId ){
+                <div class="inbox-card-time-icon" aria-hidden="true">
+                  <mat-icon>lock_clock</mat-icon>
+                </div>
+              }
+            </div>
           </article>
         }
-
-
-
       }
     </div>
+
     <mat-paginator
       class="inbox-paginator"
       [length]="filteredTickets().length"
@@ -193,6 +210,5 @@
       showFirstLastButtons
       aria-label="Paginacion de tickets"
     ></mat-paginator>
-
   }
 </section>

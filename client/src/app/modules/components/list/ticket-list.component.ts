@@ -16,6 +16,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { AuthenticationSessionService } from '../../services/authentication.service';
+import { MatButtonModule } from '@angular/material/button';
 
 
 
@@ -44,7 +45,8 @@ interface TicketFilters {
     MatPaginatorModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule
+    MatSelectModule,
+    MatButtonModule
   ],
   templateUrl: './ticket-list.component.html',
   styleUrl: './ticket-list.component.css',
@@ -240,11 +242,11 @@ export class TicketListComponent {
   }
 
   requesterLabel(ticket: Ticket): string {
-    return ticket.requester?.trim() || ticket.requesterId || 'Sin solicitante';
+    return ticket.requester?.trim() || ticket.requesterId || 'Sin encargado';
   }
 
   getManagerFullName(ticket: Ticket): string {
-    return ticket.manager?.trim() || 'Sin solicitante';
+    return ticket.manager?.trim() || 'Sin encargado';
   }
 
 
@@ -258,6 +260,35 @@ export class TicketListComponent {
 
   titleLabel(ticket: Ticket): string {
     return ticket.request?.trim() || ticket.note?.trim() || ticket.code;
+  }
+
+
+  getTicketPriority(ticket: Ticket): string | null {
+    return ticket.priority?.trim() || null;
+  }
+
+  priorityKey(ticket: Ticket): 'low' | 'medium' | 'high' | 'critical' | 'default' {
+    const value = ticket.priority?.trim().toLowerCase();
+    switch (value) {
+      case 'bajo':
+      case 'low':
+        return 'low';
+      case 'medio':
+      case 'media':
+      case 'normal':
+        return 'medium';
+      case 'alto':
+      case 'alta':
+      case 'high':
+        return 'high';
+      case 'critico':
+      case 'crítico':
+      case 'urgente':
+      case 'urgent':
+        return 'critical';
+      default:
+        return 'default';
+    }
   }
 
   updatedAgo(ticket: Ticket): string {

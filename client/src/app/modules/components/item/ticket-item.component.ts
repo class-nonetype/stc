@@ -38,11 +38,11 @@ export class TicketListItemComponent {
   private readonly dialogRef = inject(MatDialogRef<TicketListItemComponent>);
 
   get requesterDisplayName(): string {
-    return this.ticket.requester?.trim() || this.ticket.requesterId || 'Sin solicitante';
+    return this.ticket.requester?.trim() || this.ticket.requesterId || 'Sin encargado';
   }
 
   get managerDisplayName(): string {
-    return this.ticket.manager?.trim() || this.ticket.managerId || 'Sin solicitante';
+    return this.ticket.manager?.trim() || this.ticket.managerId || 'Sin encargado';
   }
 
   get displayTitle(): string {
@@ -65,6 +65,36 @@ export class TicketListItemComponent {
 
   get priorityLabel(): string {
     return this.ticket.priority ?? 'Sin prioridad';
+  }
+
+  get priorityAccentClass(): string {
+    return `ticket-pill--priority-${this.priorityKey()}`;
+  }
+
+  private priorityKey(): string {
+    const value = this.ticket.priority?.trim().toLowerCase();
+    switch (value) {
+      case 'bajo':
+      case 'baja':
+      case 'low':
+        return 'bajo';
+      case 'medio':
+      case 'media':
+      case 'normal':
+        return 'medio';
+      case 'alto':
+      case 'alta':
+      case 'high':
+        return 'alto';
+      case 'urgente':
+      case 'urgency':
+      case 'critical':
+      case 'critico':
+      case 'crítico':
+        return 'urgente';
+      default:
+        return 'sin-prioridad';
+    }
   }
 
   get statusTypes(): LevelType[] {

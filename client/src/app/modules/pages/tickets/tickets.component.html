@@ -1,9 +1,10 @@
 @if (userIsAuthenticated()) {
   <section class="page" aria-live="polite">
-    <header class="page-header">
-      <div class="page-header-body">
-        <h1 class="page-title">Inbox de tickets</h1>
-        <p class="page-subtitle">Revisa y gestiona las solicitudes mas recientes del equipo.</p>
+    <header class="inbox-header">
+      <div class="inbox-header__title-block">
+        <p class="inbox-header__eyebrow">Tickets</p>
+        <h1 class="inbox-header__title">Panel de tickets</h1>
+        <p class="inbox-header__subtitle">Revisa y gestiona las solicitudes más recientes del equipo.</p>
       </div>
     </header>
 
@@ -17,4 +18,3 @@
     ></ticket-list>
   </section>
 }
-
