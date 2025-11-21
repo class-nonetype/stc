@@ -98,7 +98,7 @@ class Tickets(Base):
     # Auditoría y control
     #source: Mapped[str | None] = mapped_column(String(32), nullable=True)  # 'web' | 'email' | 'api'
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, server_default="true")
-    is_resolved: Mapped[bool] = mapped_column(Boolean, nullable=True, default=None, server_default="null")
+    is_resolved: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     is_readed: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False, server_default="false")
 
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

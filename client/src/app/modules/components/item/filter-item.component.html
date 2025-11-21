@@ -19,9 +19,9 @@
       <mat-label>Buscar</mat-label>
       <input
         matInput
-        [value]="filters?.text || ''"
+        [value]="filters.text"
         placeholder="Codigo, solicitante, nota"
-        (input)="emitPatch('text', ($event.target as HTMLInputElement)?.value)"
+        (input)="emitPatch('text', $any($event.target).value ?? '')"
       />
       <button matSuffix mat-icon-button aria-label="Limpiar texto" (click)="emitPatch('text','')">
         <mat-icon>close</mat-icon>
@@ -30,7 +30,7 @@
 
     <mat-form-field appearance="fill">
       <mat-label>Estado</mat-label>
-      <mat-select multiple [value]="filters?.status || []" (selectionChange)="emitPatch('status', $event.value)">
+      <mat-select multiple [value]="filters.status" (selectionChange)="emitPatch('status', $event.value)">
         @for (s of statusOptions; track s) {
           <mat-option [value]="s">{{ s }}</mat-option>
         }
@@ -39,7 +39,7 @@
 
     <mat-form-field appearance="fill">
       <mat-label>Tipo</mat-label>
-      <mat-select multiple [value]="filters?.request || []" (selectionChange)="emitPatch('request', $event.value)">
+      <mat-select multiple [value]="filters.request" (selectionChange)="emitPatch('request', $event.value)">
         @for (r of requestOptions; track r) {
           <mat-option [value]="r">{{ r }}</mat-option>
         }
@@ -48,7 +48,7 @@
 
     <mat-form-field appearance="fill">
       <mat-label>Prioridad</mat-label>
-      <mat-select multiple [value]="filters?.priority || []" (selectionChange)="emitPatch('priority', $event.value)">
+      <mat-select multiple [value]="filters.priority" (selectionChange)="emitPatch('priority', $event.value)">
         @for (p of priorityOptions; track p) {
           <mat-option [value]="p">{{ p }}</mat-option>
         }
@@ -59,8 +59,8 @@
       <mat-label>Solicitante</mat-label>
       <input
         matInput
-        [value]="filters?.requester || ''"
-        (input)="emitPatch('requester', ($event.target as HTMLInputElement).value || '')"
+        [value]="filters.requester"
+        (input)="emitPatch('requester', $any($event.target).value ?? '')"
       />
       <button matSuffix mat-icon-button aria-label="Limpiar solicitante" (click)="emitPatch('requester','')">
         <mat-icon>close</mat-icon>

@@ -59,7 +59,7 @@ form {
 }
 
 .authentication-card {
-  width: min(600px, 100%);
+  width: min(580px, 100%);
   display: grid;
   gap: 28px;
   padding: clamp(30px, 4vw, 38px);

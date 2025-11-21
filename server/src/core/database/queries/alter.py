@@ -78,6 +78,19 @@ async def update_ticket(session: AsyncSession, context: str, ticket_id: UUID, ob
 
                 return True
 
+
+            case 'read':
+                statement = (
+                    update(Tickets)
+                    .where(Tickets.id == ticket_id, Tickets.is_readed.is_(False))
+                    .values(is_readed=True, updated_at=get_datetime())
+                )
+
+                await session.execute(statement)
+                await session.commit()
+
+                return True
+
     except Exception as exception:
         logger.exception(msg=exception)
         await session.rollback()

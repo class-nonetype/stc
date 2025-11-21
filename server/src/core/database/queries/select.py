@@ -100,7 +100,10 @@ async def select_request_type_description_by_id(session: AsyncSession, request_t
         .where(RequestTypes.id == request_type_id)
     )
     result = await session.execute(statement)
-    return result.scalars().first().description
+    
+    object_model = result.scalars().first()
+    
+    return object_model.description if object_model else None
 
 async def select_priority_type_description_by_id(session: AsyncSession, priority_type_id: UUID,):
     statement = (
@@ -109,7 +112,10 @@ async def select_priority_type_description_by_id(session: AsyncSession, priority
         .where(PriorityTypes.id == priority_type_id)
     )
     result = await session.execute(statement)
-    return result.scalars().first().description
+    
+    object_model = result.scalars().first()
+    
+    return object_model.description if object_model else None
 
 
 async def select_status_type_description_by_id(session: AsyncSession, status_type_id: UUID,):
@@ -119,7 +125,9 @@ async def select_status_type_description_by_id(session: AsyncSession, status_typ
         .where(StatusTypes.id == status_type_id)
     )
     result = await session.execute(statement)
-    return result.scalars().first().description
+    object_model = result.scalars().first()
+    
+    return object_model.description if object_model else None
 
 
 
@@ -292,7 +300,7 @@ async def select_all_tickets_attachments_by_ticket_id(session: AsyncSession, tic
     statement = (
         select(TicketAttachments)
         .where(TicketAttachments.ticket_id == ticket_id)
-        .order_by(asc(Tickets.created_at))
+        .order_by(asc(TicketAttachments.created_at))
     )
     result = await session.execute(statement)
     object_models = result.scalars().all()

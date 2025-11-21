@@ -47,48 +47,48 @@ async def create_users(session: AsyncSession = Depends(database)):
         )
     )
 
-    __ = await insert_user_account(
-        session=session,
-        schema=SignUpRequest(
-            UserProfile=UserProfile(
-                full_name='liliana leonor vivanco riquelme',
-                email='lvivanco@consejodeauditoria.gob.cl',
-                is_active=True),
-            UserAccount=UserAccount(
-                username='lvivanco',
-                password='12345678'),
-            TeamGroup=TeamGroup(id=audit_group_id)
-        )
-    )
+    #__ = await insert_user_account(
+    #    session=session,
+    #    schema=SignUpRequest(
+    #        UserProfile=UserProfile(
+    #            full_name='liliana leonor vivanco riquelme',
+    #            email='lvivanco@consejodeauditoria.gob.cl',
+    #            is_active=True),
+    #        UserAccount=UserAccount(
+    #            username='lvivanco',
+    #            password='12345678'),
+    #        TeamGroup=TeamGroup(id=audit_group_id)
+    #    )
+    #)
 
-    __ = await insert_user_account(
-        session=session,
-        schema=SignUpRequest(
-            UserProfile=UserProfile(
-                full_name='coco riquelme',
-                email='criquelme@consejodeauditoria.gob.cl',
-                is_active=True),
-            UserAccount=UserAccount(
-                username='criquelme',
-                password='12345678'),
-            TeamGroup=TeamGroup(id=audit_group_id)
-        )
-    )
+    #__ = await insert_user_account(
+    #    session=session,
+    #    schema=SignUpRequest(
+    #        UserProfile=UserProfile(
+    #            full_name='coco riquelme',
+    #            email='criquelme@consejodeauditoria.gob.cl',
+    #            is_active=True),
+    #        UserAccount=UserAccount(
+    #            username='criquelme',
+    #            password='12345678'),
+    #        TeamGroup=TeamGroup(id=audit_group_id)
+    #    )
+    #)
 
 
-    __ = await insert_user_account(
-        session=session,
-        schema=SignUpRequest(
-            UserProfile=UserProfile(
-                full_name='javiera ignacia riquelme gutierrez',
-                email='jriquelme@consejodeauditoria.gob.cl',
-                is_active=True),
-            UserAccount=UserAccount(
-                username='jriquelme',
-                password='12345678'),
-            TeamGroup=TeamGroup(id=audit_group_id)
-        )
-    )
+    #__ = await insert_user_account(
+    #    session=session,
+    #    schema=SignUpRequest(
+    #        UserProfile=UserProfile(
+    #            full_name='javiera ignacia riquelme gutierrez',
+    #            email='jriquelme@consejodeauditoria.gob.cl',
+    #            is_active=True),
+    #        UserAccount=UserAccount(
+    #            username='jriquelme',
+    #            password='12345678'),
+    #        TeamGroup=TeamGroup(id=audit_group_id)
+    #    )
+    #)
 
 
 
@@ -121,19 +121,19 @@ async def create_users(session: AsyncSession = Depends(database)):
         )
     )
 
-    __ = await insert_user_account(
-        session=session,
-        schema=SignUpRequest(
-            UserProfile=UserProfile(
-                full_name='blues antonio riquelme',
-                email='briquelme@consejodeauditoria.gob.cl',
-                is_active=True),
-            UserAccount=UserAccount(
-                username='briquelme',
-                password='12345678'),
-            TeamGroup=TeamGroup(id=support_group_id)
-        )
-    )
+    #__ = await insert_user_account(
+    #    session=session,
+    #    schema=SignUpRequest(
+    #        UserProfile=UserProfile(
+    #            full_name='blues antonio riquelme',
+    #            email='briquelme@consejodeauditoria.gob.cl',
+    #            is_active=True),
+    #        UserAccount=UserAccount(
+    #            username='briquelme',
+    #            password='12345678'),
+    #        TeamGroup=TeamGroup(id=support_group_id)
+    #    )
+    #)
 
     __ = await insert_user_account(
         session=session,

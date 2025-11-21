@@ -178,6 +178,27 @@ async def put_ticket_manager(request: Request,
         status_code=HTTP_200_OK,
     )
 
+@router.put(path='/update/ticket/{ticket_id}/read')
+async def put_ticket_manager(request: Request,
+                             session: Annotated[AsyncGenerator, Depends(database)],
+                             ticket_id: UUID,
+                             manager_id: UUID):
+    operation = await update_ticket(
+        session=session,
+        context='read',
+        ticket_id=ticket_id)
+    
+    if operation is None:
+        return response(response_type=1, status_code=HTTP_404_NOT_FOUND)
+    
+    if operation is False:
+        return response(response_type=1, status_code=HTTP_422_UNPROCESSABLE_ENTITY)
+
+    return response(
+        response_type=1,
+        status_code=HTTP_200_OK,
+    )
+
 
 
 

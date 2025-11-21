@@ -132,6 +132,7 @@ export interface Ticket {
   createdAt: string | null;
   updatedAt: string | null;
   isResolved: boolean | null;
+  isReaded: boolean | null;
 
   attachments?: TicketAttachment[];
 }
@@ -190,7 +191,8 @@ export type TicketResponse = {
   deletedAt?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  isResolved?: boolean | null;
+  isResolved?: boolean | null; // opcional boolean | null | undefined
+  isReaded: boolean | null;
   attachments?: TicketAttachment[] | unknown;
 
 };

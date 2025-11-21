@@ -17,7 +17,7 @@ interface ApiCollectionResponse<T> {
 export class TicketService {
   private readonly http = inject(HttpClient);
   private readonly authentication = inject(AuthenticationSessionService);
-  private readonly refreshIntervalMs = 2000;
+  private readonly refreshIntervalMs = 5000;
   private refreshIntervalId: ReturnType<typeof setInterval> | null = null;
   private refreshSubscribers = 0;
 
@@ -363,6 +363,7 @@ export class TicketService {
       createdAt: this.toNullableString(schema.createdAt),
       updatedAt: this.toNullableString(schema.updatedAt),
       isResolved: typeof schema.isResolved === 'boolean' ? schema.isResolved : null,
+      isReaded: typeof schema.isResolved === 'boolean' ? schema.isResolved : null,
       attachments: this.normalizeAttachments(schema.attachments, id),
     };
   }
@@ -390,6 +391,7 @@ export class TicketService {
       createdAt: null,
       updatedAt: null,
       isResolved: null,
+      isReaded: null,
       attachments: [],
     };
   }

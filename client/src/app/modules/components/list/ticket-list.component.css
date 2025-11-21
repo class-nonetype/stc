@@ -256,8 +256,15 @@
 }
 
 :host ::ng-deep .inbox-list .mat-mdc-list-item .mdc-list-item__background,
-:host ::ng-deep .inbox-list .mat-mdc-list-item .mdc-list-item__ripple {
+:host ::ng-deep .inbox-list .mat-mdc-list-item .mdc-list-item__ripple,
+:host ::ng-deep .inbox-list .mat-mdc-list-item .mat-mdc-focus-indicator {
   display: none !important;
+}
+:host ::ng-deep .inbox-list .mat-mdc-list-item::before,
+:host ::ng-deep .inbox-list .mat-mdc-list-item::after {
+  display: none !important;
+  content: none !important;
+  background: transparent !important;
 }
 
 :host ::ng-deep .inbox-list .mat-mdc-list-item.mdc-list-item--selected,
@@ -269,6 +276,7 @@
 .inbox-card-item:hover,
 .inbox-card-item:active {
   background: transparent !important;
+  outline: none;
 }
 
 :host ::ng-deep .inbox-card-item .mat-ripple-element {
@@ -283,8 +291,22 @@
   pointer-events: auto;
 }
 
+
+
+:host ::ng-deep .mat-mdc-paginator,
+:host ::ng-deep .mat-mdc-paginator .mat-mdc-paginator-container {
+  background: transparent !important;
+  box-shadow: none;
+  border: none;
+}
+
+
 :host ::ng-deep .inbox-list .mat-mdc-list-item .mat-mdc-list-item-unscoped-content {
   padding: 0;
+}
+
+.mat-mdc-list-item-unscoped-content.mdc-list-item__primary-text {
+  background: #000;
 }
 
 .inbox-card {
@@ -306,6 +328,7 @@
 
 .inbox-card:hover {
   transform: translateY(-2px);
+  border-radius: var(--card-radius);
   box-shadow: 0 20px 45px -35px rgba(15, 23, 42, 0.65);
 }
 
@@ -589,11 +612,15 @@
 }
 
 .inbox-empty {
-  display: grid;
-  gap: 16px;
-  justify-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
   text-align: center;
-  padding: 48px clamp(16px, 6vw, 56px);
+  padding: 32px clamp(16px, 6vw, 56px);
+  width: 100%;
+  box-sizing: border-box;
   border-radius: var(--card-radius);
   background: linear-gradient(145deg, rgba(226, 232, 240, 0.2), rgba(226, 232, 240, 0.45));
   border: 1px solid rgba(148, 163, 184, 0.25);
