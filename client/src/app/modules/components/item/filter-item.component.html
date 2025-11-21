@@ -1,0 +1,70 @@
+<article class="filter-detail">
+  <header class="filter-detail-header">
+    <div>
+      <p class="filter-detail-eyebrow">Filtros</p>
+      <h1 class="filter-detail-title">Refina tu bandeja</h1>
+    </div>
+    <div class="filter-detail-actions">
+      <button mat-icon-button type="button" aria-label="Restablecer filtros" (click)="onReset()">
+        <mat-icon aria-hidden="true">refresh</mat-icon>
+      </button>
+      <button mat-icon-button type="button" aria-label="Cerrar dialogo" (click)="onClose()">
+        <mat-icon aria-hidden="true">close</mat-icon>
+      </button>
+    </div>
+  </header>
+
+  <div class="filter-grid">
+    <mat-form-field appearance="outline">
+      <mat-label>Buscar</mat-label>
+      <input
+        matInput
+        [value]="filters?.text || ''"
+        placeholder="Codigo, solicitante, nota"
+        (input)="emitPatch('text', ($event.target as HTMLInputElement)?.value)"
+      />
+      <button matSuffix mat-icon-button aria-label="Limpiar texto" (click)="emitPatch('text','')">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Estado</mat-label>
+      <mat-select multiple [value]="filters?.status || []" (selectionChange)="emitPatch('status', $event.value)">
+        @for (s of statusOptions; track s) {
+          <mat-option [value]="s">{{ s }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Tipo</mat-label>
+      <mat-select multiple [value]="filters?.request || []" (selectionChange)="emitPatch('request', $event.value)">
+        @for (r of requestOptions; track r) {
+          <mat-option [value]="r">{{ r }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Prioridad</mat-label>
+      <mat-select multiple [value]="filters?.priority || []" (selectionChange)="emitPatch('priority', $event.value)">
+        @for (p of priorityOptions; track p) {
+          <mat-option [value]="p">{{ p }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Solicitante</mat-label>
+      <input
+        matInput
+        [value]="filters?.requester || ''"
+        (input)="emitPatch('requester', ($event.target as HTMLInputElement).value || '')"
+      />
+      <button matSuffix mat-icon-button aria-label="Limpiar solicitante" (click)="emitPatch('requester','')">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+</article>

@@ -1,5 +1,6 @@
 @if (userIsAuthenticated()) {
   <section class="page" aria-live="polite">
+
     <header class="inbox-header">
       <div class="inbox-header__title-block">
         <p class="inbox-header__eyebrow">Tickets</p>
@@ -7,7 +8,6 @@
         <p class="inbox-header__subtitle">Revisa y gestiona las solicitudes más recientes del equipo.</p>
       </div>
     </header>
-
     <ticket-list
       [tickets]="cards()"
       [loading]="loading()"

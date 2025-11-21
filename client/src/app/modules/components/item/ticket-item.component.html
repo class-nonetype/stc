@@ -16,14 +16,29 @@
         <div class="ticket-detail-heading-text">
           <!-- <p class="ticket-detail-eyebrow">{{ userTeam?.toUpperCase() }} | {{ lastUpdated }}</p> -->
           <h1 class="ticket-detail-title">{{ displayTitle }}</h1>
-          <span class="ticket-detail-panel-label">
-            {{ lastUpdated }}
-          </span>
         </div>
       </div>
-      <button type="button" class="ticket-detail-close" (click)="onClose()" aria-label="Cerrar dialogo">
-        <mat-icon aria-hidden="true">close</mat-icon>
-      </button>
+      <div class="ticket-detail-actions">
+        <button
+          type="button"
+          class="ticket-detail-icon-btn"
+          matTooltip="Creado: {{ createdLabel }}"
+          aria-label="Fecha de creacion"
+        >
+          <mat-icon aria-hidden="true">event</mat-icon>
+        </button>
+        <button
+          type="button"
+          class="ticket-detail-icon-btn"
+          matTooltip="Actualizado: {{ updatedLabel }}"
+          aria-label="Fecha de modificacion"
+        >
+          <mat-icon aria-hidden="true">update</mat-icon>
+        </button>
+        <button type="button" class="ticket-detail-close" (click)="onClose()" aria-label="Cerrar dialogo">
+          <mat-icon aria-hidden="true">close</mat-icon>
+        </button>
+      </div>
     </header>
 
     <div class="ticket-detail-chips">
@@ -50,6 +65,8 @@
         <span class="ticket-pill-value">{{ priorityLabel }}</span>
       </span>
     </div>
+
+    <div class="ticket-detail-divider" aria-hidden="true"></div>
 
 
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Literal
 from uuid import UUID
 
-from sqlalchemy import and_, desc, select
+from sqlalchemy import and_, asc, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -204,6 +204,7 @@ async def select_all_tickets_by_requester_id(session: AsyncSession, requester_id
             Tickets.requester_id == requester_id,
             Tickets.is_active.is_(True),  # mejor que == True
         )
+        .order_by(asc(Tickets.created_at))
     )
     result = await session.execute(statement)
     object_models = result.scalars().all()
@@ -250,6 +251,7 @@ async def select_all_tickets_by_assignee_id(session: AsyncSession, assignee_id: 
             Tickets.assignee_id == assignee_id,
             Tickets.is_active.is_(True),  # mejor que == True
         )
+        .order_by(asc(Tickets.created_at))
     )
     result = await session.execute(statement)
     object_models = result.scalars().all()
@@ -290,6 +292,7 @@ async def select_all_tickets_attachments_by_ticket_id(session: AsyncSession, tic
     statement = (
         select(TicketAttachments)
         .where(TicketAttachments.ticket_id == ticket_id)
+        .order_by(asc(Tickets.created_at))
     )
     result = await session.execute(statement)
     object_models = result.scalars().all()
@@ -313,6 +316,7 @@ async def select_all_tickets_for_manager(session: AsyncSession):
     statement = (
         select(Tickets)
         .where(Tickets.is_active.is_(True))
+        .order_by(asc(Tickets.created_at))
     )
 
     result = await session.execute(statement)
@@ -363,6 +367,7 @@ async def select_all_finished_tickets_by_requester_id(session: AsyncSession, req
             Tickets.is_active.is_(True),
             Tickets.is_resolved.is_(True)
         )
+        .order_by(asc(Tickets.created_at))
     )
     result = await session.execute(statement)
     object_models = result.scalars().all()

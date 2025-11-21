@@ -18,12 +18,15 @@ import { MatSelectModule } from '@angular/material/select';
 import { AuthenticationSessionService } from '../../services/authentication.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { FilterItemComponent } from '../item/filter-item.component';
 
 
 
 type NullableDate = string | null;
 
-interface TicketFilters {
+export interface TicketFilters {
   text: string;                 // busca en code, requester, request, note
   status: string[];             // múltiples estados
   request: string[];            // tipos (request)
@@ -48,14 +51,17 @@ interface TicketFilters {
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    MatListModule
+    MatListModule,
+    MatDialogModule,
+    MatTooltipModule
   ],
   templateUrl: './ticket-list.component.html',
   styleUrl: './ticket-list.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TicketListComponent {
-  private readonly userSession = inject(AuthenticationSessionService);
+  private readonly authenticationService = inject(AuthenticationSessionService);
+  private readonly dialog = inject(MatDialog);
 
   readonly tickets = input<Ticket[]>([]);
   readonly loading = input<boolean>(false);
@@ -226,6 +232,28 @@ export class TicketListComponent {
     this.pageSize.set(event.pageSize);
   }
 
+  openFilters(): void {
+    const dialogRef = this.dialog.open(FilterItemComponent, {
+      width: '760px',
+      maxWidth: '96vw',
+      panelClass: 'filter-dialog-panel',
+      data: {
+        filters: this.filters(),
+        status: this.statusOptions(),
+        request: this.requestOptions(),
+        priority: this.priorityOptions()
+      }
+    });
+
+    dialogRef.componentInstance.patch.subscribe(({ key, value }) => {
+      this.patchFilters(key as keyof TicketFilters, value as any);
+    });
+
+    dialogRef.componentInstance.reset.subscribe(() => {
+      this.resetFilters();
+    });
+  }
+
   statusKey(ticket: Ticket): string {
     const base = ticket.status?.trim().toLowerCase().replace(/\s+/g, '_');
     if (base && base.length) {
@@ -253,11 +281,16 @@ export class TicketListComponent {
 
 
   getCurrentUserTeam() {
-    return this.userSession.getCurrentUserTeam();
+    return this.authenticationService.getCurrentUserTeam();
   }
 
   getCurrentUserId() {
-    return this.userSession.getCurrentUserId();
+    return this.authenticationService.getCurrentUserId();
+  }
+
+
+  getCurrentUserFullName() {
+    return this.authenticationService.getCurrentUserFullName();
   }
 
   titleLabel(ticket: Ticket): string {

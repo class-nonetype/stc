@@ -50,3 +50,11 @@ ticket-list {
 .inbox-hero {
   margin: 0 0 8px;
 }
+
+@media (max-width: 900px) {
+  .page h1,
+  .page .inbox-header,
+  .page .inbox-header__subtitle {
+    display: none;
+  }
+}

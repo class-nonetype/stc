@@ -114,8 +114,8 @@ def seed_default_status_types(target, connection, **kwargs) -> None:
         {"value": 2, "description": "Abierto"},
         {"value": 3, "description": "En proceso"},
         {"value": 4, "description": "Resuelto"},
-        {"value": 5, "description": "Cerrado"},
-        {"value": 6, "description": "Cancelado"},
+        #{"value": 5, "description": "Cerrado"},
+        {"value": 5, "description": "Cancelado"},
     ]
     connection.execute(target.insert(), data)
 

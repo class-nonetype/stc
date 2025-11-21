@@ -9,6 +9,7 @@ import { TicketService } from '../../services/ticket.service';
 import { MatChipsModule } from '@angular/material/chips';
 import type { LevelType } from '../../interfaces/ticket.interface';
 import { environment } from '@environments/environment';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'ticket-list-item',
@@ -19,7 +20,8 @@ import { environment } from '@environments/environment';
     MatIconModule,
     MatButtonModule,
     MatButton,
-    MatChipsModule],
+    MatChipsModule,
+    MatTooltipModule],
   templateUrl: './ticket-item.component.html',
   styleUrl: './ticket-item.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -49,6 +51,14 @@ export class TicketListItemComponent {
     //return this.ticket.note?.trim() || this.ticket.code;
 
     return this.ticket.request ?? this.ticket.code;
+  }
+
+  get createdLabel(): string {
+    return this.formatDate(this.ticket.createdAt) ?? 'Sin fecha';
+  }
+
+  get updatedLabel(): string {
+    return this.formatDate(this.ticket.updatedAt) ?? 'Sin fecha';
   }
 
   get statusLabel(): string {

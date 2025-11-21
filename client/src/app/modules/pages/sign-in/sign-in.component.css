@@ -28,7 +28,7 @@
 .authentication-panel--visual {
   background: url('/1.png');
   background-repeat: no-repeat;
-  background-size: 65% auto;
+  background-size: 70% auto;
   background-position: center;
   align-items: flex-end;
   justify-content: flex-start;
@@ -47,9 +47,10 @@
   align-items: center;
   justify-content: center;
   padding: clamp(1rem, 2.5vw, 2.25rem);
-  background: rgba(255, 255, 255, 0.85);
+  /* background: rgba(255, 255, 255, 0.85); */
+  background: transparent;
   backdrop-filter: blur(8px);
-  box-shadow: 0 30px 70px rgba(15, 23, 42, 0.08);
+  /* box-shadow: 0 30px 70px rgba(15, 23, 42, 0.08); */
 }
 
 form {
@@ -58,7 +59,7 @@ form {
 }
 
 .authentication-card {
-  width: min(540px, 100%);
+  width: min(600px, 100%);
   display: grid;
   gap: 28px;
   padding: clamp(30px, 4vw, 38px);

@@ -79,7 +79,7 @@ export class HomePage implements OnInit, OnDestroy {
     'Abierto': 'opened',
     'En proceso': 'inProgress',
     'En espera': 'onHold',
-    'Cerrado': 'closed',
+    //'Cerrado': 'closed',
     'Cancelado': 'cancelled',
     'Resuelto': 'finished',
   };
@@ -192,14 +192,15 @@ export class HomePage implements OnInit, OnDestroy {
         disabled: this.ticketCount.opened === 0,
         click: () => navToTickets('Abierto')
       },
-      {
-        icon: 'cancel',
-        label: 'Tickets cerrados',
-        subtitle: '',
-        value: this.ticketCount.closed,
-        disabled: this.ticketCount.closed === 0,
-        click: () => navToTickets('Cerrado')
-      },
+      //{
+      //  icon: 'cancel',
+      //  label: 'Tickets cerrados',
+      //  subtitle: '',
+      //  value: this.ticketCount.closed,
+      //  disabled: this.ticketCount.closed === 0,
+      //  click: () => navToTickets('Cerrado')
+      //},
+
       {
         icon: 'error',
         label: 'Tickets cancelados',
@@ -208,6 +209,7 @@ export class HomePage implements OnInit, OnDestroy {
         disabled: this.ticketCount.cancelled === 0,
         click: () => navToTickets('Cancelado')
       },
+
       {
         icon: 'task_alt',
         label: 'Tickets finalizados',
