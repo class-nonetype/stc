@@ -1,0 +1,54 @@
+<article class="request-type-dialog">
+  <header class="request-type-dialog__header">
+    <div>
+      <p class="request-type-dialog__eyebrow">Nuevo tipo</p>
+      <h1 class="request-type-dialog__title">Registrar tipo de solicitud</h1>
+      <p class="request-type-dialog__subtitle">
+        Define las opciones que los usuarios verán al crear un ticket.
+      </p>
+    </div>
+    <button type="button" class="request-type-dialog__close" (click)="onClose()" aria-label="Cerrar dialogo">
+      <mat-icon aria-hidden="true">close</mat-icon>
+    </button>
+  </header>
+
+  @if (submitSuccess()) {
+    <p class="request-type-dialog__banner request-type-dialog__banner--success" role="status">
+      <mat-icon aria-hidden="true">check_circle</mat-icon>
+      Tipo de solicitud creado correctamente.
+    </p>
+  }
+
+  <form class="request-type-dialog__form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+    <section class="request-type-dialog__section">
+      <header class="request-type-dialog__section-heading">
+        <h3 class="request-type-dialog__section-title">Datos generales</h3>
+        <p class="request-type-dialog__section-subtitle">Agrega una descripcion clara del tipo de solicitud.</p>
+        <br>
+      </header>
+
+      <mat-form-field appearance="outline" class="request-type-dialog__field">
+        <mat-label>Descripción</mat-label>
+        <input
+          matInput
+          type="text"
+          formControlName="description"
+          maxlength="500"
+          placeholder="Ej. Cambio de contraseña" />
+        <mat-hint align="end">{{ form.get('description')?.value?.length || 0 }}/500</mat-hint>
+        @if (form.get('description')?.hasError('required')) {
+          <mat-error>Debes agregar una descripción.</mat-error>
+        }
+      </mat-form-field>
+    </section>
+
+    <div class="request-type-dialog__actions">
+      <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+      <span class="request-type-dialog__actions-spacer"></span>
+      <button mat-flat-button color="primary" type="submit" [disabled]="submitting()">
+        <mat-icon aria-hidden="true">{{ submitting() ? 'hourglass_top' : 'add_task' }}</mat-icon>
+        {{ submitting() ? 'Creando...' : 'Crear tipo' }}
+      </button>
+    </div>
+  </form>
+</article>

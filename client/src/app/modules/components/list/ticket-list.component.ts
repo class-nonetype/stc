@@ -21,6 +21,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FilterItemComponent } from '../item/filter-item.component';
+import { TicketService } from '../../services/ticket.service';
 
 
 
@@ -61,6 +62,8 @@ export interface TicketFilters {
 })
 export class TicketListComponent {
   private readonly authenticationService = inject(AuthenticationSessionService);
+  private readonly ticketService = inject(TicketService);
+
   private readonly dialog = inject(MatDialog);
 
   readonly tickets = input<Ticket[]>([]);
@@ -71,6 +74,7 @@ export class TicketListComponent {
   readonly open = output<Ticket>();
   readonly retry = output<void>();
 
+  private readonly markingAsRead = new Set<string>();
 
   readonly pageIndex = signal(0);
   readonly pageSize = signal(6);
@@ -221,6 +225,28 @@ export class TicketListComponent {
 
   onOpen(ticket: Ticket): void {
     this.open.emit(ticket);
+
+    if ( this.authenticationService.getCurrentUserTeam() === 'Soporte') {
+      if (ticket.isReaded === true || this.markingAsRead.has(ticket.id)) return;
+
+      this.markingAsRead.add(ticket.id);
+
+      this.ticketService.setTicketReadStatus(ticket.id).subscribe({
+        next: success => {
+          if (success) {
+            ticket.isReaded = true; // evita reintentos mientras refresca la lista
+            this.ticketService.getAllTickets({ silent: true });
+          }
+        },
+        error: err => {
+          console.error('No se pudo actualizar el estado', err);
+        },
+        complete: () => {
+          this.markingAsRead.delete(ticket.id);
+        }
+      });
+    }
+
   }
 
   onRetry(): void {

@@ -252,6 +252,17 @@ export class TicketService {
       .pipe(map(() => true));
   }
 
+  setTicketReadStatus(ticketId: string) {
+    console.log('Cambiando el estado de lectura del objeto: ', ticketId);
+
+    return this.http
+      .put<boolean>(
+        `${environment.apiUrl}/${endpoints.tickets.setTickeReadStatusByTicketId(ticketId)}`,
+        {}
+      )
+      .pipe(map(() => true));
+  }
+
   setTicketStatusByTicketId(ticketId: string, statusId: string) {
     return this.http
       .put<boolean>(
@@ -363,7 +374,7 @@ export class TicketService {
       createdAt: this.toNullableString(schema.createdAt),
       updatedAt: this.toNullableString(schema.updatedAt),
       isResolved: typeof schema.isResolved === 'boolean' ? schema.isResolved : null,
-      isReaded: typeof schema.isResolved === 'boolean' ? schema.isResolved : null,
+      isReaded: typeof schema.isReaded === 'boolean' ? schema.isReaded : null,
       attachments: this.normalizeAttachments(schema.attachments, id),
     };
   }

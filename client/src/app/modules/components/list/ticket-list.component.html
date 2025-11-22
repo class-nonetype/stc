@@ -8,115 +8,102 @@
       </button>
     </div>
 
-    <mat-paginator
-      class="inbox-paginator"
-      [length]="filteredTickets().length"
-      [pageIndex]="pageIndex()"
-      [pageSize]="pageSize()"
-      [pageSizeOptions]="pageSizeOptions"
-      (page)="onPageChange($event)"
-      showFirstLastButtons
-      aria-label="Paginacion de tickets"
-    ></mat-paginator>
+    <mat-paginator class="inbox-paginator" [length]="filteredTickets().length" [pageIndex]="pageIndex()"
+      [pageSize]="pageSize()" [pageSizeOptions]="pageSizeOptions" (page)="onPageChange($event)" showFirstLastButtons
+      aria-label="Paginacion de tickets"></mat-paginator>
   </div>
 
   <div class="inbox-results">
     @if (loading()) {
-      <div class="inbox-skeleton" role="presentation" aria-hidden="true">
-        <div class="s-row"></div>
-        <div class="s-row"></div>
-        <div class="s-row"></div>
-      </div>
+    <div class="inbox-skeleton" role="presentation" aria-hidden="true">
+      <div class="s-row"></div>
+      <div class="s-row"></div>
+      <div class="s-row"></div>
+    </div>
     } @else if (hasError()) {
-      <div class="inbox-error" role="alert">
-        <div class="inbox-error-content">
-          <h2 class="inbox-error-title">No pudimos cargar los tickets</h2>
-          <p>Revisa tu conexion e intentalo nuevamente.</p>
-        </div>
-        <button type="button" class="inbox-error-action" (click)="onRetry()">Reintentar</button>
+    <div class="inbox-error" role="alert">
+      <div class="inbox-error-content">
+        <h2 class="inbox-error-title">No pudimos cargar los tickets</h2>
+        <p>Revisa tu conexion e intentalo nuevamente.</p>
       </div>
+      <button type="button" class="inbox-error-action" (click)="onRetry()">Reintentar</button>
+    </div>
     } @else if (!tickets().length) {
-      <div class="inbox-empty" role="status">
-        <div class="inbox-empty-icon">
-          <mat-icon aria-hidden="true">assignment_late</mat-icon>
-        </div>
-        <p class="inbox-empty-message">Sin tickets pendientes</p>
-
-        <!-- <p class="inbox-empty-hint">Todo esta en orden por ahora.</p> -->
+    <div class="inbox-empty" role="status">
+      <div class="inbox-empty-icon">
+        <mat-icon aria-hidden="true">assignment_late</mat-icon>
       </div>
+      <p class="inbox-empty-message">Sin tickets pendientes</p>
+
+      <!-- <p class="inbox-empty-hint">Todo esta en orden por ahora.</p> -->
+    </div>
     } @else {
-      <mat-list class="inbox-list" aria-label="Bandeja de tickets">
-        @for (ticket of visibleTickets(); track ticket.id) {
-          @if ( getCurrentUserTeam() === 'Asesoría'
-                || (getCurrentUserTeam() == 'Soporte'
-                    && getCurrentUserId() === ticket.managerId
-                    || !ticket.managerId)
-          ){
-            <button
-              mat-list-item
-              disableRipple
-              class="inbox-card-item"
-              type="button"
-              (click)="onOpen(ticket)"
-            >
-              <div
-                class="inbox-card"
-                [class.inbox-card--unread]="isUnread(ticket)"
-              >
-                <div class="inbox-card-icon" aria-hidden="true">
-                  <mat-icon>{{ isUnread(ticket) ? 'mark_email_unread' : 'drafts' }}</mat-icon>
-                </div>
+    <mat-list class="inbox-list" aria-label="Bandeja de tickets">
+      @for (ticket of visibleTickets(); track ticket.id) {
+      @if ( getCurrentUserTeam() === 'Asesoría'
+      || (getCurrentUserTeam() == 'Soporte'
+      && getCurrentUserId() === ticket.managerId
+      || !ticket.managerId)
+      ){
+      <button mat-list-item disableRipple class="inbox-card-item" type="button" (click)="onOpen(ticket)">
+        <div class="inbox-card">
+          <div class="inbox-card-icon" aria-hidden="true">
 
-                <div class="inbox-card-content">
+            @if ( getCurrentUserTeam() === 'Soporte' ){
+            <!-- mark_email_unread -->
+            <mat-icon>email_lock</mat-icon>
+            } @else if ( getCurrentUserTeam() === 'Asesoría' ) {
+            <mat-icon>forward_to_inbox</mat-icon>
+            }
 
-                  <h2 class="inbox-card-title">{{ titleLabel(ticket) }}</h2>
+          </div>
 
-                  <div class="inbox-card-pills">
-                    <span class="inbox-card-code">{{ ticket.code }}</span>
-                    <span
-                      class="inbox-card-priority"
-                      [class.inbox-card-priority--low]="priorityKey(ticket) === 'low'"
-                      [class.inbox-card-priority--medium]="priorityKey(ticket) === 'medium'"
-                      [class.inbox-card-priority--high]="priorityKey(ticket) === 'high'"
-                      [class.inbox-card-priority--critical]="priorityKey(ticket) === 'critical'"
-                    >
-                      {{ ticket.priority }}
-                    </span>
-                    <span class="inbox-card-status">{{ statusLabel(ticket) }}</span>
-                  </div>
+          <div class="inbox-card-content">
 
-                  <div class="inbox-card-footer">
-                    <span class="inbox-card-footer-left">
-                      {{ getManagerFullName(ticket) }} | {{ requesterLabel(ticket) }}
-                    </span>
+            <h2 class="inbox-card-title">{{ titleLabel(ticket) }}</h2>
 
-                    <span class="inbox-card-footer-right">
+            <div class="inbox-card-pills">
+              <span class="inbox-card-code">{{ ticket.code }}</span>
+              <span class="inbox-card-priority" [class.inbox-card-priority--low]="priorityKey(ticket) === 'low'"
+                [class.inbox-card-priority--medium]="priorityKey(ticket) === 'medium'"
+                [class.inbox-card-priority--high]="priorityKey(ticket) === 'high'"
+                [class.inbox-card-priority--critical]="priorityKey(ticket) === 'critical'">
+                {{ ticket.priority }}
+              </span>
+              <span class="inbox-card-status">{{ statusLabel(ticket) }}</span>
+            </div>
 
-                      @if ( ticket.manager ){
-                        <mat-icon
-                          aria-hidden="true"
-                          [title]="ticket.manager || 'Sin encargado'"
-                        >how_to_reg</mat-icon>
-                      }
+            <div class="inbox-card-footer">
+              <span class="inbox-card-footer-left">
+                {{ getManagerFullName(ticket) }} | {{ requesterLabel(ticket) }}
+              </span>
 
-                      <mat-icon
-                        aria-hidden="true"
-                        [matTooltip]="'Creado: ' + (ticket.createdAt || 'Sin fecha')"
-                      >event</mat-icon>
-                      <mat-icon
-                        aria-hidden="true"
-                        [matTooltip]="'Actualizado: ' + (ticket.updatedAt || 'Sin fecha')"
-                      >update</mat-icon>
-                    </span>
-                  </div>
+              <span class="inbox-card-footer-right">
 
-                </div>
-              </div>
-            </button>
-          }
+                @if ( ticket.manager && getCurrentUserFullName() != ticket.manager ){
+                <mat-icon aria-hidden="true" [matTooltip]="ticket.manager || 'Sin encargado'">how_to_reg</mat-icon>
+                } @else if ( ticket.manager && getCurrentUserFullName() === ticket.manager ) {
+                <mat-icon aria-hidden="true" [matTooltip]="'Yo'">how_to_reg</mat-icon>
+                }
 
-        }
-      </mat-list>
+                @if ( ticket.isReaded && getCurrentUserTeam() === 'Asesoría' ){
+                <mat-icon aria-hidden="true" [matTooltip]="'Leído por el encargado'">mark_email_read</mat-icon>
+                }
+
+                <mat-icon aria-hidden="true"
+                  [matTooltip]="'Creado: ' + (ticket.createdAt || 'Sin fecha')">event</mat-icon>
+                <mat-icon aria-hidden="true"
+                  [matTooltip]="'Actualizado: ' + (ticket.updatedAt || 'Sin fecha')">update</mat-icon>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </button>
+      }
+
+      }
+    </mat-list>
     }
   </div>
 </section>

@@ -5,10 +5,20 @@
       <h1 class="filter-detail-title">Refina tu bandeja</h1>
     </div>
     <div class="filter-detail-actions">
-      <button mat-icon-button type="button" aria-label="Restablecer filtros" (click)="onReset()">
+      <button
+        type="button"
+        class="filter-detail-icon-btn"
+        aria-label="Restablecer filtros"
+        (click)="onReset()"
+      >
         <mat-icon aria-hidden="true">refresh</mat-icon>
       </button>
-      <button mat-icon-button type="button" aria-label="Cerrar dialogo" (click)="onClose()">
+      <button
+        type="button"
+        class="filter-detail-icon-btn"
+        aria-label="Cerrar dialogo"
+        (click)="onClose()"
+      >
         <mat-icon aria-hidden="true">close</mat-icon>
       </button>
     </div>

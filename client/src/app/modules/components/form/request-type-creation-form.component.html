@@ -1,0 +1,61 @@
+<section
+  class="request-type-sidenav"
+  [class.request-type-sidenav--open]="sidenavState.isOpen('request-type')"
+  [attr.aria-hidden]="!sidenavState.isOpen('request-type')">
+  <div class="request-type-sidenav-backdrop" (click)="onBackdropClick()" aria-hidden="true"></div>
+
+  <article class="request-type-sidenav-panel" role="dialog" aria-labelledby="request-type-sidenav-title" aria-modal="true">
+    <form class="sidenav-form" [formGroup]="requestTypeForm" (ngSubmit)="onSubmit()" novalidate>
+      <header class="sidenav-form-header">
+        <div>
+          <p class="sidenav-form-eyebrow">Nuevo tipo de solicitud</p>
+          <h2 id="request-type-sidenav-title" class="sidenav-form-title">Registrar tipo de solicitud</h2>
+          <p class="sidenav-form-subtitle">
+            Define las opciones que los usuarios veran al crear un ticket.
+          </p>
+        </div>
+        <button type="button" class="sidenav-form-close" (click)="onCancel()" aria-label="Cerrar panel">
+          <mat-icon aria-hidden="true">close</mat-icon>
+        </button>
+      </header>
+
+      @if (submitSuccess()) {
+        <p class="sidenav-form-banner sidenav-form-banner--success" role="status">
+          <mat-icon aria-hidden="true">check_circle</mat-icon>
+          Tipo de solicitud creado correctamente.
+        </p>
+      }
+
+      <section class="sidenav-section" formGroupName="general">
+        <header class="sidenav-section-header">
+          <!-- <h3 class="sidenav-section-title">Datos generales</h3> -->
+          <p class="sidenav-section-subtitle">Agrega una descripcion clara del tipo de solicitud.</p>
+        </header>
+
+        <div class="sidenav-grid">
+          <mat-form-field appearance="outline" class="sidenav-grid-full">
+            <mat-label>Descripcion</mat-label>
+            <input
+              matInput
+              formControlName="description"
+              maxlength="50"
+              placeholder="Ej. Cambio de contrasena" />
+            <mat-hint align="end">{{ generalForm.get('description')?.value?.length || 0 }}/50</mat-hint>
+            @if (generalForm.get('description')?.hasError('required')) {
+              <mat-error>Debes agregar una descripcion.</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="sidenav-step-actions sidenav-step-actions--end">
+          <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+          <span class="sidenav-step-actions-spacer"></span>
+          <button mat-flat-button color="primary" type="submit" [disabled]="submitting()">
+            <mat-icon aria-hidden="true">{{ submitting() ? 'hourglass_top' : 'add_task' }}</mat-icon>
+            {{ submitting() ? 'Creando...' : 'Crear tipo' }}
+          </button>
+        </div>
+      </section>
+    </form>
+  </article>
+</section>

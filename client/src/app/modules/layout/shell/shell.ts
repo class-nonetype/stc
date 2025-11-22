@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 
 import { AppSidenav } from '../../components/sidenav/sidenav';
 import { AppTicketCreationFormComponent } from '../../components/form/ticket-creation-form.component';
+//import { RequestTypeCreationFormComponent } from '../../components/form/request-type-creation-form.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,6 +16,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
     AppSidenav,
     RouterOutlet,
     AppTicketCreationFormComponent,
+    //RequestTypeCreationFormComponent,
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,

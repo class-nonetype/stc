@@ -1,7 +1,7 @@
 <section
   class="ticket-sidenav"
-  [class.ticket-sidenav--open]="sidenavState.opened()"
-  aria-hidden="{{ !sidenavState.opened() }}"
+  [class.ticket-sidenav--open]="sidenavState.isOpen('ticket')"
+  [attr.aria-hidden]="!sidenavState.isOpen('ticket')"
 >
   <div class="ticket-sidenav-backdrop" (click)="onBackdropClick()" aria-hidden="true"></div>
 

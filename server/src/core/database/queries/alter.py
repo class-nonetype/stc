@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from sqlalchemy import and_, select, update
+from sqlalchemy import and_, select, update, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.database.models.types import StatusTypes
@@ -26,7 +26,7 @@ async def update_last_login_date(session: AsyncSession, user_account_id: UUID) -
 
 
 
-async def update_ticket(session: AsyncSession, context: str, ticket_id: UUID, object_id: UUID) -> (bool | None):
+async def update_ticket(session: AsyncSession, context: str, ticket_id: UUID, object_id: UUID = None) -> (bool | None):
     try:
         match context:
             case 'status':
@@ -43,27 +43,22 @@ async def update_ticket(session: AsyncSession, context: str, ticket_id: UUID, ob
 
 
             case 'manager':
-                
                 # estado 'En proceso'
-                status = (
-                    select(StatusTypes)
-                    .select_from(StatusTypes)
-                    .where(StatusTypes.value == 2)
+                status_query = (
+                    select(StatusTypes.id)
+                    .where(
+                        StatusTypes.description.is_not(None),
+                        func.lower(StatusTypes.description) == 'en proceso'
+                    )
+                    .limit(1)
                 )
-                
-                result = await session.execute(status)
-                
-                object_model = result.scalars().first()
-                
-                if not object_model:
+
+                result = await session.execute(status_query)
+                status_id = result.scalar_one_or_none()
+
+                if not status_id:
                     return None
 
-                status_id = object_model.id
-                
-                
-                logger.info(status_id)
-                print(status_id)
-                
                 statement = (
                     update(Tickets)
                     .where(Tickets.id == ticket_id, Tickets.is_active.is_(True))

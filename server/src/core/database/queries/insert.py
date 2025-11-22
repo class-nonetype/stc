@@ -38,6 +38,15 @@ async def insert_ticket(session: AsyncSession, schema: TicketRequest) -> Tickets
     )
 
 
+async def insert_request_type(session: AsyncSession, **data_model) -> Tickets:
+
+    return await insert_object_model(
+        session=session,
+        base_model=RequestTypes,
+        data_model=data_model
+    )
+
+
 async def insert_user_account(session: AsyncSession, schema: SignUpRequest) -> dict | bool:
     user_profile = await insert_object_model(
         session=session,

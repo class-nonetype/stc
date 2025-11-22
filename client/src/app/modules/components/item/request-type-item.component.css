@@ -1,0 +1,141 @@
+.request-type-dialog {
+  display: grid;
+  gap: 18px;
+  padding: clamp(18px, 3vw, 26px);
+  width: min(720px, 100%);
+  box-sizing: border-box;
+}
+
+.request-type-dialog__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.request-type-dialog__eyebrow {
+  margin: 0;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.request-type-dialog__title {
+  margin: 4px 0 6px;
+  font-size: clamp(1.4rem, 2.3vw, 1.8rem);
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.request-type-dialog__subtitle {
+  margin: 0;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+.request-type-dialog__close {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(248, 250, 252, 0.95);
+  color: #1f2937;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background-color 140ms ease, transform 140ms ease;
+  padding: 0;
+}
+
+.request-type-dialog__close:hover {
+  background: rgba(37, 99, 235, 0.22);
+  transform: translateY(-1px);
+}
+
+.request-type-dialog__banner {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.request-type-dialog__banner mat-icon {
+  font-size: 1.1rem;
+}
+
+.request-type-dialog__banner--success {
+  background: rgba(16, 185, 129, 0.16);
+  color: #047857;
+}
+
+.request-type-dialog__form {
+  display: grid;
+  gap: 16px;
+}
+
+.request-type-dialog__section {
+  display: grid;
+  gap: 12px;
+  padding: clamp(16px, 2.2vw, 20px);
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.request-type-dialog__section-heading {
+  display: grid;
+  gap: 4px;
+}
+
+.request-type-dialog__section-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.request-type-dialog__section-subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.request-type-dialog__field {
+  width: 100%;
+}
+
+.request-type-dialog input[matInput] {
+  height: 44px;
+  line-height: 1.2;
+}
+
+.request-type-dialog__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.request-type-dialog__actions-spacer {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 600px) {
+  .request-type-dialog__header {
+    flex-direction: column;
+  }
+
+  .request-type-dialog__actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .request-type-dialog__actions button {
+    width: 100%;
+    justify-content: center;
+  }
+}

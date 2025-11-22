@@ -24,6 +24,7 @@ export const endpoints = {
 
     setTicketStatusByTicketId: (ticketId: string, statusId: string) => `${applicationRoute}/update/ticket/${ticketId}/status/${statusId}`,
     setTicketManagerByTicketId: (ticketId: string, managerId: string) => `${applicationRoute}/update/ticket/${ticketId}/manager/${managerId}`,
+    setTickeReadStatusByTicketId: (ticketId: string) => `${applicationRoute}/update/ticket/${ticketId}/read`,
 
   },
 
@@ -33,6 +34,7 @@ export const endpoints = {
 
   types: {
     requestTypes: `${applicationRoute}/select/all/types/request`,
+    postRequestType: `${applicationRoute}/create/types/request`,
     priorityTypes: `${applicationRoute}/select/all/types/priority`,
     statusTypes: `${applicationRoute}/select/all/types/status`,
     supportUsers: `${applicationRoute}/select/all/users/support`,

@@ -1,10 +1,16 @@
 from fastapi import (
     APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
     Request,
-    Depends
+    UploadFile,
+    status,
 )
-from fastapi.encoders import jsonable_encoder
 
+from src.core.database.models.types import RequestTypes
+from src.core.database.queries.helpers import insert_object_model
 from src.core.database.queries.select import select_all_teams
 from src.core.schemas.sign_up_request import *
 from src.api.responses import response
@@ -24,7 +30,7 @@ from src.core.database.queries.insert import insert_user_account
 
 
 @router.post(path='/create/users')
-async def create_users(session: AsyncSession = Depends(database)):
+async def post_user(session: AsyncSession = Depends(database)):
     for team in await select_all_teams(session=session):
         if team.description == 'Soporte':
             support_group_id = team.id
@@ -148,4 +154,5 @@ async def create_users(session: AsyncSession = Depends(database)):
             TeamGroup=TeamGroup(id=support_group_id)
         )
     )
+
 

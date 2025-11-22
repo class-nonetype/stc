@@ -22,6 +22,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-ticket-creation-form',
+  standalone: true,
   templateUrl: './ticket-creation-form.component.html',
   styleUrl: './ticket-creation-form.component.css',
   imports: [
@@ -95,7 +96,7 @@ export class AppTicketCreationFormComponent {
     this.teamService.loadTeams();
 
     effect(() => {
-      const opened = this.sidenavState.opened();
+      const opened = this.sidenavState.isOpen('ticket');
       if (!opened) {
         this.submitSuccess.set(false);
         return;
@@ -132,7 +133,7 @@ export class AppTicketCreationFormComponent {
 
   close(): void {
     this.resetForm();
-    this.sidenavState.close();
+    this.sidenavState.close('ticket');
   }
 
   onSubmit(): void {
@@ -190,7 +191,7 @@ export class AppTicketCreationFormComponent {
         this.submitting.set(false);
         this.submitSuccess.set(true);
         this.resetForm(true);
-        this.sidenavState.close();
+        this.sidenavState.close('ticket');
       },
       error: () => {
         this.submitting.set(false);

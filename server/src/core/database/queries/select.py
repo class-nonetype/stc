@@ -244,6 +244,7 @@ async def select_all_tickets_by_requester_id(session: AsyncSession, requester_id
             'createdAt': object_model.created_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.created_at is not None else None,
             'updatedAt': object_model.updated_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.updated_at is not None else None,
             'isResolved': object_model.is_resolved,
+            'isReaded': object_model.is_readed,
             'attachments': await select_all_tickets_attachments_by_ticket_id(session=session, ticket_id=object_model.id)
 
         } for object_model in object_models
@@ -289,6 +290,7 @@ async def select_all_tickets_by_assignee_id(session: AsyncSession, assignee_id: 
             'createdAt': object_model.created_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.created_at is not None else None,
             'updatedAt': object_model.updated_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.updated_at is not None else None,
             'isResolved': object_model.is_resolved,
+            'isReaded': object_model.is_readed,
             'attachments': await select_all_tickets_attachments_by_ticket_id(session=session, ticket_id=object_model.id)
         } for object_model in object_models
     ]
@@ -355,6 +357,7 @@ async def select_all_tickets_for_manager(session: AsyncSession):
             'createdAt': object_model.created_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.created_at is not None else None,
             'updatedAt': object_model.updated_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.updated_at is not None else None,
             'isResolved': object_model.is_resolved,
+            'isReaded': object_model.is_readed,
             'attachments': await select_all_tickets_attachments_by_ticket_id(session=session, ticket_id=object_model.id)
         } for object_model in object_models
     ]
@@ -404,6 +407,7 @@ async def select_all_finished_tickets_by_requester_id(session: AsyncSession, req
             'createdAt': object_model.created_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.created_at is not None else None,
             'updatedAt': object_model.updated_at.strftime('%d/%m/%Y %H:%M:%S %p') if object_model.updated_at is not None else None,
             'isResolved': object_model.is_resolved,
+            'isReaded': object_model.is_readed,
             'attachments': await select_all_tickets_attachments_by_ticket_id(session=session, ticket_id=object_model.id)
         } for object_model in object_models
     ]

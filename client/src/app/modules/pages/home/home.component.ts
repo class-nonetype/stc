@@ -11,6 +11,8 @@ import { FormService } from '../../services/form.service';
 import { Router } from '@angular/router';
 import { AuthenticationSessionService } from '../../services/authentication.service';
 import { TicketService } from '../../services/ticket.service';
+import { MatDialog } from '@angular/material/dialog';
+import { RequestTypeItemComponent } from '../../components/item/request-type-item.component';
 
 import { forkJoin, map } from 'rxjs';
 
@@ -58,6 +60,7 @@ export class HomePage implements OnInit, OnDestroy {
   private readonly userSession = inject(AuthenticationSessionService);
   private readonly ticketService = inject(TicketService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly dialog = inject(MatDialog);
 
   readonly userIsAuthenticated = this.userSession.isAuthenticated;
   readonly userFullName = this.userSession.getCurrentUserFullName();
@@ -93,6 +96,13 @@ export class HomePage implements OnInit, OnDestroy {
       subtitle: 'Visualice las solicitudes que han sido emitidas.',
       click: () => this.router.navigate(['/tickets'])
     },
+
+    {
+      icon: 'library_add_check',
+      label: 'Crear tipo de solicitud',
+      subtitle: 'Añade un nuevo tipo de solicitud para que pueda ser emitido por los usuarios.',
+      click: () => this.openRequestTypeDialog()
+    }
   ];
 
   private readonly advisorBaseOptions: HomeOption[] = [
@@ -101,7 +111,7 @@ export class HomePage implements OnInit, OnDestroy {
       iconBadge: 'speaker_notes',
       label: 'Enviar un ticket',
       subtitle: 'Describa su problema rellenando el formulario de ticket de soporte',
-      click: () => this.openForm()
+      click: () => this.openForm('ticket')
     },
     {
       icon: 'confirmation_number',
@@ -238,9 +248,20 @@ export class HomePage implements OnInit, OnDestroy {
 
 
 
-  openForm(event?: Event) {
+  openForm(context: string, event?: Event) {
     event?.preventDefault();
     event?.stopPropagation();
-    this.form.open();
+    this.form.open(context);
+  }
+
+  openRequestTypeDialog(event?: Event) {
+    event?.preventDefault();
+    event?.stopPropagation();
+
+    this.dialog.open(RequestTypeItemComponent, {
+      maxWidth: '720px',
+      width: 'min(720px, 96vw)',
+      panelClass: 'ticket-detail-dialog-panel',
+    });
   }
 }

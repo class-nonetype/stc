@@ -19,11 +19,12 @@ from fastapi import (
 )
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.responses import response
 from src.core.schemas.ticket_request import TicketRequest
 
-from src.core.database.queries.insert import insert_ticket
+from src.core.database.queries.insert import insert_request_type, insert_ticket
 from src.core.database.queries.helpers import insert_object_model
 from src.core.database.session import database
 
@@ -44,7 +45,7 @@ from src.core.database.queries.select import (
 from src.core.database.models import TicketAttachments
 from src.utils.paths import TICKETS_ATTACHMENTS_DIRECTORY_PATH
 
-
+from src.utils.logger import logger
 
 router = APIRouter()
 
@@ -52,7 +53,7 @@ router = APIRouter()
 # id solicitante
 @router.get('/select/all/tickets/requester/{requester_id}')
 async def get_all_tickets_by_requester_id(request: Request,
-                                          session: Annotated[AsyncGenerator, Depends(database)], 
+                                          session: Annotated[AsyncSession, Depends(database)], 
                                           requester_id: UUID):
     data = await select_all_tickets_by_requester_id(session=session, requester_id=requester_id)
 
@@ -65,7 +66,7 @@ async def get_all_tickets_by_requester_id(request: Request,
 # id usuario asignado
 #@router.get('/select/all/tickets/assignee/{assignee_id}')
 #async def get_all_tickets_by_assignee_id(request: Request,
-#                                         session: Annotated[AsyncGenerator, Depends(database)], 
+#                                         session: Annotated[AsyncSession, Depends(database)], 
 #                                         assignee_id: UUID):
 #    data = await select_all_tickets_by_assignee_id(session=session, assignee_id=assignee_id)
 #    return {'data': data}
@@ -73,7 +74,7 @@ async def get_all_tickets_by_requester_id(request: Request,
 
 # encargado
 @router.get('/select/all/tickets/manager')
-async def get_all_tickets_for_manager(request: Request, session: Annotated[AsyncGenerator, Depends(database)]):
+async def get_all_tickets_for_manager(request: Request, session: Annotated[AsyncSession, Depends(database)]):
     data = await select_all_tickets_for_manager(session=session)
     return {'data': data}
 
@@ -81,13 +82,13 @@ async def get_all_tickets_for_manager(request: Request, session: Annotated[Async
 
 
 @router.get('/select/total/tickets/requester/{requester_id}')
-async def get_total_tickets_by_requester_id(request: Request, session: Annotated[AsyncGenerator, Depends(database)], requester_id: UUID, status: str):
+async def get_total_tickets_by_requester_id(request: Request, session: Annotated[AsyncSession, Depends(database)], requester_id: UUID, status: str):
     data = await select_count_tickets_by_requester_id(session=session, requester_id=requester_id, status=status)
     return {'data': data}
 
 
 @router.get('/select/total/tickets/manager')
-async def get_total_tickets_for_manager(request: Request, session: Annotated[AsyncGenerator, Depends(database)], status: str):
+async def get_total_tickets_for_manager(request: Request, session: Annotated[AsyncSession, Depends(database)], status: str):
     data = await select_count_tickets_for_manager(session=session, status=status)
     return {'data': data}
 
@@ -103,29 +104,29 @@ async def get_total_tickets_for_manager(request: Request, session: Annotated[Asy
 
 
 @router.get(path='/select/all/types/request')
-async def get_all_request_types(request: Request, session: Annotated[AsyncGenerator, Depends(database)]):
+async def get_all_request_types(request: Request, session: Annotated[AsyncSession, Depends(database)]):
     data = await select_all_request_types(session)
     return {'data': data}
 
 @router.get(path='/select/all/types/priority')
-async def get_all_priority_types(request: Request, session: Annotated[AsyncGenerator, Depends(database)]):
+async def get_all_priority_types(request: Request, session: Annotated[AsyncSession, Depends(database)]):
     data = await select_all_priority_types(session)
     return {'data': data}
 
 
 @router.get(path='/select/all/types/status')
-async def get_all_status_types(request: Request, session: Annotated[AsyncGenerator, Depends(database)]):
+async def get_all_status_types(request: Request, session: Annotated[AsyncSession, Depends(database)]):
     data = await select_all_status_types(session)
     return {'data': data}
 
 
 @router.get(path='/select/all/teams')
-async def get_all_teams(request: Request, session: Annotated[AsyncGenerator, Depends(database)]):
+async def get_all_teams(request: Request, session: Annotated[AsyncSession, Depends(database)]):
     data = await select_all_teams(session)
     return {'data': data}
 
 @router.get(path='/select/all/users/support')
-async def get_all_support_users(request: Request, session: Annotated[AsyncGenerator, Depends(database)]):
+async def get_all_support_users(request: Request, session: Annotated[AsyncSession, Depends(database)]):
     data = await select_all_support_users(session)
     return {'data': data}
 
@@ -136,7 +137,7 @@ async def get_all_support_users(request: Request, session: Annotated[AsyncGenera
 
 @router.put(path='/update/ticket/{ticket_id}/status/{status_id}')
 async def put_ticket_status(request: Request,
-                            session: Annotated[AsyncGenerator, Depends(database)],
+                            session: Annotated[AsyncSession, Depends(database)],
                             ticket_id: UUID,
                             status_id: UUID):
     operation = await update_ticket(
@@ -158,7 +159,7 @@ async def put_ticket_status(request: Request,
 
 @router.put(path='/update/ticket/{ticket_id}/manager/{manager_id}')
 async def put_ticket_manager(request: Request,
-                             session: Annotated[AsyncGenerator, Depends(database)],
+                             session: Annotated[AsyncSession, Depends(database)],
                              ticket_id: UUID,
                              manager_id: UUID):
     operation = await update_ticket(
@@ -179,10 +180,9 @@ async def put_ticket_manager(request: Request,
     )
 
 @router.put(path='/update/ticket/{ticket_id}/read')
-async def put_ticket_manager(request: Request,
-                             session: Annotated[AsyncGenerator, Depends(database)],
-                             ticket_id: UUID,
-                             manager_id: UUID):
+async def put_ticket_read_status(request: Request,
+                                 session: Annotated[AsyncSession, Depends(database)],
+                                 ticket_id: UUID):
     operation = await update_ticket(
         session=session,
         context='read',
@@ -371,3 +371,34 @@ async def download_ticket_attachment(
 
 
 
+@router.post(path='/create/types/request')
+async def post_request_type(request: Request,
+                         session: Annotated[AsyncSession, Depends(database)],
+                         description: str = Form(...),):
+
+    logger.info(msg=f'{request.client.host}:{request.client.port}')
+
+    try:
+        object_model = await insert_request_type(session=session, description=description)
+
+        return response(
+            response_type=2,
+            status_code=HTTP_200_OK,
+            media_type='application/json',
+            content={'status': True}
+        ) if object_model else response(
+            response_type=2,
+            status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+            media_type='application/json',
+            content={'status': 'error'}
+        )
+
+    except Exception as exception:
+        logger.exception(msg=f'{request.client.host}:{request.client.port}: {exception}')
+
+        return response(
+            response_type=2,
+            status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+            media_type='application/json',
+            content={'message': 'Internal Server Error'}
+        )
